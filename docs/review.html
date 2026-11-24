@@ -1036,7 +1036,7 @@
         <a href="#pros-cons" data-audit-anchor="pros-cons">Pros &amp; Cons</a>
         <a href="#judging" data-audit-anchor="judging">Judging</a>
         <a href="#actions" data-audit-anchor="actions">Gate G1 Plan</a>
-        <a href="#road-to-10" class="nav-tab-new" id="nav-road-to-10" data-view-trigger="upgrade">Road to 10/10 <span class="notif-pill"><span class="notif-dot"></span>NEW</span></a>
+        <a href="#improvement" class="nav-tab-new" id="nav-road-to-10" data-view-trigger="upgrade">Road to 10/10 <span class="notif-pill"><span class="notif-dot"></span>NEW</span></a>
       </nav>
       <div class="nav-actions">
         <button class="btn" id="themeBtn" type="button" title="Toggle light/dark mode">Dark Mode</button>
@@ -1071,7 +1071,7 @@
           <span class="notif-pill"><span class="notif-dot"></span>NEW</span>
         </button>
       </div>
-      <span class="view-tab-meta">Switch tabs to inspect the concrete 6.8 → 10/10 upgrade plan</span>
+      <button class="btn" id="btn-copy-improvement" type="button" title="Copy direct #improvement share link">Copy #improvement Link</button>
     </div>
 
     <div id="view-audit" class="view-panel" role="tabpanel" aria-labelledby="tab-btn-audit">
@@ -1784,7 +1784,7 @@
     <!-- NEW TAB: Road to 10/10 Blueprint -->
     <div id="view-upgrade" class="view-panel hidden" role="tabpanel" aria-labelledby="tab-btn-upgrade">
       <!-- Upgrade Hero & Live Score Simulator -->
-      <section id="road-to-10" style="margin-top: 0;">
+      <section id="improvement" style="margin-top: 0;">
         <div class="upgrade-hero">
           <div>
             <div class="eyebrow-row" style="margin-bottom: 10px;">
@@ -2335,8 +2335,8 @@
 
       if (updateHash) {
         if (isUpgrade) {
-          history.replaceState(null, '', '#road-to-10');
-        } else if (window.location.hash === '#road-to-10') {
+          history.replaceState(null, '', '#improvement');
+        } else if (window.location.hash === '#improvement' || window.location.hash === '#road-to-10') {
           history.replaceState(null, '', '#verdict');
         }
       }
@@ -2368,14 +2368,48 @@
       });
     });
 
-    // Deep-link support (?tab=10-of-10 or #road-to-10)
-    (function initViewFromUrl() {
+    // Deep-link support (#improvement, #road-to-10, ?tab=improvement, ?tab=10-of-10)
+    const upgradeHashes = new Set(['#improvement', '#road-to-10', '#upgrade-pillars', '#upgrade-diagram', '#scope-rebudget', '#upgrade-checklist']);
+    function syncViewFromUrl() {
       const params = new URLSearchParams(window.location.search);
       const hash = window.location.hash.toLowerCase();
-      if (params.get('tab') === '10-of-10' || params.get('tab') === 'upgrade' || hash === '#road-to-10') {
+      const tabParam = (params.get('tab') || '').toLowerCase();
+      if (tabParam === 'improvement' || tabParam === '10-of-10' || tabParam === 'upgrade' || upgradeHashes.has(hash)) {
         setActiveView('upgrade', false);
+        if (hash && hash !== '#improvement' && hash !== '#road-to-10') {
+          const targetEl = document.getElementById(hash.slice(1));
+          if (targetEl) targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      } else if (hash) {
+        setActiveView('audit', false);
       }
-    })();
+    }
+    syncViewFromUrl();
+    window.addEventListener('hashchange', syncViewFromUrl);
+
+    // Copy shareable #improvement link
+    const copyImpBtn = document.getElementById('btn-copy-improvement');
+    if (copyImpBtn) {
+      copyImpBtn.addEventListener('click', () => {
+        const shareUrl = window.location.href.split('#')[0].split('?')[0] + '#improvement';
+        const showCopied = () => {
+          const orig = copyImpBtn.textContent;
+          copyImpBtn.textContent = 'Copied #improvement!';
+          copyImpBtn.classList.add('btn-primary');
+          setTimeout(() => {
+            copyImpBtn.textContent = orig;
+            copyImpBtn.classList.remove('btn-primary');
+          }, 1800);
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(shareUrl).then(showCopied).catch(() => {
+            window.prompt('Copy shareable link:', shareUrl);
+          });
+        } else {
+          window.prompt('Copy shareable link:', shareUrl);
+        }
+      });
+    }
 
     // Diagram switcher (inside Audit tab)
     const tabBtns = document.querySelectorAll('.tab-btn');
