@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dialect — Critical Review &amp; Architecture Assessment</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --surface-alt: #f1f5f9;
+      --border: #e2e8f0;
+      --border-strong: #cbd5e1;
+      --text: #0f172a;
+      --text-muted: #475569;
+      --text-soft: #64748b;
+      --primary: #0f766e;
+      --primary-bg: #f0fdfa;
+      --primary-border: #99f6e4;
+      --indigo: #4338ca;
+      --indigo-bg: #eef2ff;
+      --indigo-border: #c7d2fe;
+      --amber: #b45309;
+      --amber-bg: #fffbeb;
+      --amber-border: #fde68a;
+      --rose: #be123c;
+      --rose-bg: #fff1f2;
+      --rose-border: #fecdd3;
+      --emerald: #047857;
+      --emerald-bg: #ecfdf5;
+      --emerald-border: #a7f3d0;
+      --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+      --shadow-md: 0 6px 20px rgba(15, 23, 42, 0.07);
+      --radius: 14px;
+      --radius-sm: 9px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0b1120;
+      --surface: #111827;
+      --surface-alt: #1e293b;
+      --border: #1f2937;
+      --border-strong: #334155;
+      --text: #f1f5f9;
+      --text-muted: #cbd5e1;
+      --text-soft: #94a3b8;
+      --primary: #2dd4bf;
+      --primary-bg: rgba(45, 212, 191, 0.12);
+      --primary-border: rgba(45, 212, 191, 0.35);
+      --indigo: #818cf8;
+      --indigo-bg: rgba(129, 140, 248, 0.12);
+      --indigo-border: rgba(129, 140, 248, 0.35);
+      --amber: #fbbf24;
+      --amber-bg: rgba(251, 191, 36, 0.12);
+      --amber-border: rgba(251, 191, 36, 0.35);
+      --rose: #fb7185;
+      --rose-bg: rgba(251, 113, 133, 0.12);
+      --rose-border: rgba(251, 113, 133, 0.35);
+      --emerald: #34d399;
+      --emerald-bg: rgba(52, 211, 153, 0.12);
+      --emerald-border: rgba(52, 211, 153, 0.35);
+      --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 10px 28px rgba(0, 0, 0, 0.38);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.62;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Top Nav */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: color-mix(in srgb, var(--surface) 88%, transparent);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .topbar-inner {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      text-decoration: none;
+    }
+    .brand-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--indigo));
+      box-shadow: 0 0 0 4px var(--primary-bg);
+    }
+    .nav-links {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .nav-links a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 6px 11px;
+      border-radius: 8px;
+      transition: all 0.15s ease;
+    }
+    .nav-links a:hover {
+      color: var(--text);
+      background: var(--surface-alt);
+    }
+    .nav-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .btn {
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--text);
+      font-family: var(--sans);
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 7px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+    [data-theme="dark"] .btn-primary { color: #042f2e; }
+    .btn-primary:hover {
+      opacity: 0.92;
+      color: #ffffff;
+    }
+    [data-theme="dark"] .btn-primary:hover { color: #042f2e; }
+
+    /* Container */
+    .container {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 36px 24px 80px;
+    }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, var(--surface) 0%, var(--primary-bg) 100%);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px 36px 32px;
+      box-shadow: var(--shadow-md);
+      margin-bottom: 32px;
+    }
+    .eyebrow-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .pill {
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--text-muted);
+    }
+    .pill-teal {
+      background: var(--primary-bg);
+      border-color: var(--primary-border);
+      color: var(--primary);
+    }
+    .pill-indigo {
+      background: var(--indigo-bg);
+      border-color: var(--indigo-border);
+      color: var(--indigo);
+    }
+    .pill-amber {
+      background: var(--amber-bg);
+      border-color: var(--amber-border);
+      color: var(--amber);
+    }
+    .hero h1 {
+      margin: 0 0 12px;
+      font-size: clamp(1.85rem, 3.5vw, 2.65rem);
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+    }
+    .hero-sub {
+      margin: 0;
+      max-width: 820px;
+      font-size: 1.05rem;
+      color: var(--text-muted);
+    }
+
+    /* Section Headings */
+    section {
+      margin-top: 44px;
+      scroll-margin-top: 78px;
+    }
+    .sec-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    .sec-head h2 {
+      margin: 0;
+      font-size: 1.48rem;
+      letter-spacing: -0.02em;
+    }
+    .sec-head p {
+      margin: 4px 0 0;
+      color: var(--text-muted);
+      font-size: 0.94rem;
+    }
+
+    /* Verdict Score Grid */
+    .score-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(245px, 1fr));
+      gap: 16px;
+    }
+    .score-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .score-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+    }
+    .score-title {
+      font-weight: 700;
+      font-size: 0.96rem;
+    }
+    .score-num {
+      font-size: 1.45rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+    .score-num span {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-soft);
+    }
+    .bar-track {
+      height: 8px;
+      border-radius: 999px;
+      background: var(--surface-alt);
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+    }
+    .score-desc {
+      margin: 0;
+      font-size: 0.87rem;
+      color: var(--text-muted);
+    }
+
+    /* Two-column novelty cards */
+    .split-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 18px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      box-shadow: var(--shadow-sm);
+    }
+    .card h3 {
+      margin: 0 0 12px;
+      font-size: 1.08rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .clean-list {
+      margin: 0;
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      font-size: 0.92rem;
+      color: var(--text-muted);
+    }
+    .clean-list strong { color: var(--text); }
+    code {
+      font-family: var(--mono);
+      font-size: 0.84em;
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      padding: 1px 5px;
+      border-radius: 5px;
+      color: var(--text);
+    }
+
+    /* Diagram Panel */
+    .diagram-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      overflow: hidden;
+    }
+    .diagram-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-alt);
+    }
+    .tab-group {
+      display: inline-flex;
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 10px;
+      padding: 3px;
+      gap: 3px;
+    }
+    .tab-btn {
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: var(--sans);
+      font-size: 0.84rem;
+      font-weight: 600;
+      padding: 7px 14px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .tab-btn.active {
+      background: var(--primary);
+      color: #ffffff;
+    }
+    [data-theme="dark"] .tab-btn.active { color: #042f2e; }
+    .diagram-hint {
+      font-size: 0.82rem;
+      color: var(--text-soft);
+    }
+    .svg-wrap {
+      padding: 18px 14px 10px;
+      overflow-x: auto;
+      background: var(--surface);
+    }
+    .svg-wrap svg {
+      width: 100%;
+      min-width: 780px;
+      height: auto;
+      display: block;
+    }
+    .svg-node {
+      cursor: pointer;
+      transition: opacity 0.15s ease, transform 0.15s ease;
+    }
+    .svg-node:hover rect {
+      filter: brightness(0.96);
+      stroke-width: 2.2;
+    }
+    .svg-node.selected rect {
+      stroke-width: 2.8;
+    }
+    .inspector {
+      border-top: 1px solid var(--border);
+      background: var(--surface-alt);
+      padding: 14px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .inspector-badge {
+      font-size: 0.74rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 4px 9px;
+      border-radius: 6px;
+      background: var(--primary-bg);
+      color: var(--primary);
+      border: 1px solid var(--primary-border);
+      white-space: nowrap;
+    }
+    .inspector-text {
+      flex: 1;
+      min-width: 240px;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+    .inspector-text strong { color: var(--text); }
+    .hidden { display: none !important; }
+
+    /* Findings Grid */
+    .finding-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+    }
+    .finding-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-top: 4px solid var(--amber);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .finding-card.critical { border-top-color: var(--rose); }
+    .finding-card.opportunity { border-top-color: var(--primary); }
+    .finding-tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      color: var(--amber);
+    }
+    .finding-card.critical .finding-tag { color: var(--rose); }
+    .finding-card.opportunity .finding-tag { color: var(--primary); }
+    .finding-card h3 {
+      margin: 0 0 8px;
+      font-size: 1.03rem;
+    }
+    .finding-card p {
+      margin: 0 0 10px;
+      font-size: 0.89rem;
+      color: var(--text-muted);
+    }
+    .fix-box {
+      font-size: 0.86rem;
+      background: var(--surface-alt);
+      border-left: 3px solid var(--primary);
+      padding: 9px 12px;
+      border-radius: 0 8px 8px 0;
+      color: var(--text);
+    }
+
+    /* Callout Banner */
+    .callout {
+      margin-top: 18px;
+      background: var(--indigo-bg);
+      border: 1px solid var(--indigo-border);
+      border-radius: var(--radius);
+      padding: 18px 22px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .callout-icon {
+      font-size: 1.25rem;
+      line-height: 1;
+      padding-top: 2px;
+    }
+    .callout h4 {
+      margin: 0 0 4px;
+      color: var(--indigo);
+      font-size: 0.98rem;
+    }
+    .callout p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    /* Filter Pills for Pros & Cons */
+    .filter-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .filter-pill {
+      border: 1px solid var(--border-strong);
+      background: var(--surface);
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 6px 13px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .filter-pill.active, .filter-pill:hover {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #ffffff;
+    }
+    [data-theme="dark"] .filter-pill.active,
+    [data-theme="dark"] .filter-pill:hover { color: #042f2e; }
+
+    .pros-cons-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 18px;
+    }
+    .pc-column {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .pc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    .pc-header h3 {
+      margin: 0;
+      font-size: 1.06rem;
+    }
+    .pc-item {
+      padding: 12px 14px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      border: 1px solid var(--border);
+      background: var(--surface-alt);
+    }
+    .pc-item:last-child { margin-bottom: 0; }
+    .pc-item.pro {
+      background: var(--emerald-bg);
+      border-color: var(--emerald-border);
+    }
+    .pc-item.con {
+      background: var(--rose-bg);
+      border-color: var(--rose-border);
+    }
+    .pc-meta {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 4px;
+    }
+    .pc-item.pro .pc-meta { color: var(--emerald); }
+    .pc-item.con .pc-meta { color: var(--rose); }
+    .pc-item h4 {
+      margin: 0 0 4px;
+      font-size: 0.94rem;
+    }
+    .pc-item p {
+      margin: 0;
+      font-size: 0.87rem;
+      color: var(--text-muted);
+    }
+
+    /* Table */
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow-x: auto;
+      box-shadow: var(--shadow-sm);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    th, td {
+      text-align: left;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    th {
+      background: var(--surface-alt);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-soft);
+    }
+    tr:last-child td { border-bottom: none; }
+    .status-chip {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .chip-green { background: var(--emerald-bg); color: var(--emerald); border: 1px solid var(--emerald-border); }
+    .chip-teal { background: var(--primary-bg); color: var(--primary); border: 1px solid var(--primary-border); }
+    .chip-amber { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+
+    /* Interactive Checklist */
+    .checklist {
+      display: grid;
+      gap: 10px;
+    }
+    .check-item {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 15px 18px;
+      cursor: pointer;
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+    .check-item:hover { border-color: var(--primary); }
+    .check-item.done {
+      background: var(--emerald-bg);
+      border-color: var(--emerald-border);
+    }
+    .check-item input[type="checkbox"] {
+      width: 19px;
+      height: 19px;
+      margin-top: 2px;
+      accent-color: var(--primary);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .check-item.done .check-title {
+      text-decoration: line-through;
+      opacity: 0.75;
+    }
+    .check-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 3px;
+    }
+    .check-desc {
+      font-size: 0.87rem;
+      color: var(--text-muted);
+    }
+    .progress-note {
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    footer {
+      margin-top: 56px;
+      padding-top: 22px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 0.82rem;
+      color: var(--text-soft);
+    }
+
+    /* Print Styling */
+    @media print {
+      .topbar, .filter-row, .diagram-toolbar, .inspector { display: none !important; }
+      body { background: #ffffff; color: #0f172a; }
+      .container { padding: 0; max-width: 100%; }
+      .hero, .card, .score-card, .diagram-card, .pc-column, .finding-card, .table-wrap, .check-item {
+        box-shadow: none !important;
+        break-inside: avoid;
+      }
+      #diag-loop { display: block !important; margin-top: 20px; }
+      .svg-wrap svg { min-width: 0; width: 100%; }
+    }
+
+    @media (max-width: 680px) {
+      .hero { padding: 24px 20px; }
+      .topbar-inner { padding: 10px 16px; }
+      .container { padding: 24px 16px 60px; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a class="brand" href="#top">
+        <span class="brand-dot"></span>
+        <span>Dialect · Project Review</span>
+      </a>
+      <nav class="nav-links" aria-label="Section navigation">
+        <a href="#verdict">Verdict</a>
+        <a href="#novelty">Novelty</a>
+        <a href="#diagrams">Diagrams</a>
+        <a href="#effectiveness">Effectiveness</a>
+        <a href="#pros-cons">Pros &amp; Cons</a>
+        <a href="#judging">Judging</a>
+        <a href="#actions">Gate G1 Plan</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="btn" id="themeBtn" type="button" title="Toggle light/dark mode">Dark Mode</button>
+        <button class="btn btn-primary" type="button" onclick="window.print()">Print / Save PDF</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container" id="top">
+    <!-- Hero -->
+    <section class="hero" style="margin-top: 0;">
+      <div class="eyebrow-row">
+        <span class="pill pill-teal">Open Agentic Web Challenge (Cognizant)</span>
+        <span class="pill pill-indigo">Pre-Build Architecture &amp; Novelty Review</span>
+        <span class="pill pill-amber">Gate G1 Audit · 24 Nov 2026</span>
+        <span class="pill">Model: Google Gemini 4 Neon (high reasoning)</span>
+      </div>
+      <h1>Dialect: Critical Review &amp; Feedback</h1>
+      <p class="hero-sub">
+        An independent evaluation of <strong>Dialect</strong>—browser-run, evolved agent networks that map hospital local lab codes to LOINC with asymmetric abstention (<code>+1 / 0 / -5</code>) and cross-origin peer loading. Assessed for <strong>novelty</strong>, <strong>technical effectiveness</strong>, <strong>real-world usefulness</strong>, and <strong>hackathon readiness</strong>.
+      </p>
+    </section>
+
+    <!-- Verdict -->
+    <section id="verdict">
+      <div class="sec-head">
+        <div>
+          <h2>Executive Verdict</h2>
+          <p>High-signal summary across four dimensions prior to writing application code (Phase P0).</p>
+        </div>
+      </div>
+
+      <div class="score-grid">
+        <article class="score-card">
+          <div class="score-top">
+            <span class="score-title">Novelty &amp; Originality</span>
+            <span class="score-num" style="color: var(--primary);">7.5<span>/10</span></span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width: 75%; background: var(--primary);"></div></div>
+          <p class="score-desc">
+            Individual parts exist in prior art, but the <strong>architectural inversion</strong> (public evolved network + browser execution + private site context) plus shipping the missing community <strong>Conformance Validator</strong> is genuinely novel.
+          </p>
+        </article>
+
+        <article class="score-card">
+          <div class="score-top">
+            <span class="score-title">Technical Effectiveness</span>
+            <span class="score-num" style="color: var(--indigo);">6.5<span>/10</span></span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width: 65%; background: var(--indigo);"></div></div>
+          <p class="score-desc">
+            Strong potential <em>if</em> two traps are resolved before Gate G2: separating <strong>alias caching vs. true generalization</strong>, and handling <strong>missing units</strong> in MIMIC-IV <code>d_labitems</code>.
+          </p>
+        </article>
+
+        <article class="score-card">
+          <div class="score-top">
+            <span class="score-title">Real-World Usefulness</span>
+            <span class="score-num" style="color: var(--emerald);">7.0<span>/10</span></span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width: 70%; background: var(--emerald);"></div></div>
+          <p class="score-desc">
+            Very useful as a <strong>zero-install mapping &amp; drift-audit workbench</strong> exporting FHIR <code>ConceptMap</code>/CSV—not as a live clinical router in Chrome. The Conformance Validator has <strong>immediate 10/10 utility</strong>.
+          </p>
+        </article>
+
+        <article class="score-card">
+          <div class="score-top">
+            <span class="score-title">Scope &amp; Timeline Realism</span>
+            <span class="score-num" style="color: var(--amber);">6.0<span>/10</span></span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width: 60%; background: var(--amber);"></div></div>
+          <p class="score-desc">
+            Exceptionally disciplined plan (kill rule, single facts file, synthetic hygiene), but the full scope realistically requires <strong>130–160 hrs</strong> vs. the budgeted <strong>84 hrs</strong> solo across holidays.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- Novelty -->
+    <section id="novelty">
+      <div class="sec-head">
+        <div>
+          <h2>1. Is This Something New and Novel?</h2>
+          <p>Separating well-trodden prior art from the genuinely distinctive synthesis.</p>
+        </div>
+      </div>
+
+      <div class="split-grid">
+        <div class="card">
+          <h3><span class="pill">Prior Art</span> What Is Commodity (Not New)</h3>
+          <ul class="clean-list">
+            <li><strong>LLM/ML-assisted LOINC mapping:</strong> Regenstrief’s <em>RELMA + Lab Auto Mapper</em>, commercial suites (Wolters Kluwer Map Manager, IMO Health), contrastive embeddings, and LLM agents like <em>LabBridge</em> (81–90% accuracy) already target automated code mapping.</li>
+            <li><strong>Asymmetric abstention (<code>+1 / 0 / -5</code>):</strong> Selective prediction, reject-option classification, and conformal risk control are established ML theory.</li>
+            <li><strong>Local approval memory:</strong> Saving human-verified mappings as site-local examples is standard Human-in-the-Loop (HITL) RAG.</li>
+            <li><strong>Offline prompt/config tuning:</strong> Evolutionary optimization over templates, retrieval <em>k</em>, and thresholds parallels DSPy and EvoPrompt.</li>
+          </ul>
+        </div>
+
+        <div class="card" style="border-color: var(--primary-border);">
+          <h3><span class="pill pill-teal">Differentiator</span> What Is Genuinely Novel</h3>
+          <ul class="clean-list">
+            <li><strong>"Skill travels to data" via Open Agentic Websites:</strong> While most hackathon entries build consumer mashups (pizza/travel bots), mapping public agent networks + browser execution + private <code>sly_data</code> onto hospital interoperability gives the open agentic web a compelling enterprise reason to exist.</li>
+            <li><strong>Auditable, evolved Neuro SAN JSON on the open web:</strong> Publishing every generation’s network JSON + held-out safety score directly connects evolutionary AI (Miikkulainen), zero-error verification (Hodjat), and privacy-preserving decentralized agents (Raskar).</li>
+            <li><strong>Ecosystem infrastructure (Conformance Validator):</strong> Spotting the empty testing <code>TODO</code> in Cognizant’s repo and shipping a live spec validator turns the submission into a reusable community tool.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Diagrams -->
+    <section id="diagrams">
+      <div class="sec-head">
+        <div>
+          <h2>2. Architecture &amp; Decision-Loop Diagrams</h2>
+          <p>Click any component in either diagram to inspect its role and key review feedback.</p>
+        </div>
+      </div>
+
+      <div class="diagram-card">
+        <div class="diagram-toolbar">
+          <div class="tab-group" role="tablist">
+            <button class="tab-btn active" type="button" data-diagram="arch">Architecture &amp; Trust Boundaries</button>
+            <button class="tab-btn" type="button" data-diagram="loop">Abstention &amp; Adaptation Loop</button>
+          </div>
+          <span class="diagram-hint">Interactive SVG · Click any box to inspect</span>
+        </div>
+
+        <!-- Diagram 1: System Architecture -->
+        <div class="svg-wrap" id="diag-arch">
+          <svg viewBox="0 0 1060 530" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Dialect System Architecture and Privacy Trust Boundaries">
+            <defs>
+              <marker id="arrow-teal" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#0f766e"/>
+              </marker>
+              <marker id="arrow-slate" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b"/>
+              </marker>
+              <marker id="arrow-amber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#d97706"/>
+              </marker>
+              <marker id="arrow-indigo" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#4f46e5"/>
+              </marker>
+            </defs>
+
+            <!-- Zone 1: Hospital A -->
+            <rect x="16" y="20" width="234" height="335" rx="14" fill="#f0fdfa" stroke="#5eead4" stroke-width="1.5"/>
+            <text x="32" y="46" font-size="12.5" font-weight="700" fill="#0f766e">HOSPITAL A · ORIGIN A (PUBLIC)</text>
+
+            <!-- Zone 1b: Community Validator -->
+            <rect x="16" y="376" width="234" height="134" rx="14" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1.5"/>
+            <text x="32" y="402" font-size="12" font-weight="700" fill="#4338ca">COMMUNITY SHARED TOOL</text>
+
+            <!-- Zone 2: Hospital B Browser -->
+            <rect x="284" y="20" width="466" height="490" rx="14" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.8"/>
+            <text x="302" y="46" font-size="12.5" font-weight="700" fill="#0f172a">HOSPITAL B · ORIGIN B (VISITOR BROWSER RUNTIME)</text>
+            <rect x="594" y="29" width="140" height="22" rx="11" fill="#ecfdf5" stroke="#6ee7b7"/>
+            <text x="664" y="44" text-anchor="middle" font-size="10.5" font-weight="700" fill="#047857">PRIVATE CONTEXT ZONE</text>
+
+            <!-- Zone 3: External LLM Egress -->
+            <rect x="784" y="20" width="260" height="490" rx="14" fill="#fffbeb" stroke="#f59e0b" stroke-width="1.8" stroke-dasharray="7 5"/>
+            <text x="802" y="46" font-size="12.5" font-weight="700" fill="#b45309">LLM INFERENCE BOUNDARY</text>
+            <rect x="802" y="56" width="224" height="22" rx="6" fill="#fef3c7" stroke="#fcd34d"/>
+            <text x="914" y="71" text-anchor="middle" font-size="10.5" font-weight="700" fill="#92400e">TRUE DATA EGRESS BOUNDARY</text>
+
+            <!-- Hospital A Nodes -->
+            <g class="svg-node" data-title="Manifest &amp; Links (Origin A)" data-badge="Stage One" data-desc="Publishes agent-manifest.json, links.json, peer_policy, allowed_peers, and CORS headers so any peer or validator can inspect Hospital A.">
+              <rect x="34" y="68" width="198" height="58" rx="10" fill="#ffffff" stroke="#0f766e" stroke-width="1.4"/>
+              <text x="133" y="93" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a">agent-manifest.json</text>
+              <text x="133" y="111" text-anchor="middle" font-size="10.5" fill="#475569">&amp; links.json (CORS public)</text>
+            </g>
+
+            <g class="svg-node" data-title="Evolved Neuro SAN Network JSON" data-badge="Public Skill" data-desc="Fully resolved multi-agent mapper network published as open JSON. Hospital B downloads this skill; Hospital A never receives B's lab codes, alias table, or API key.">
+              <rect x="34" y="156" width="198" height="66" rx="10" fill="#ffffff" stroke="#0f766e" stroke-width="1.8"/>
+              <text x="133" y="184" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a">Evolved Neuro SAN</text>
+              <text x="133" y="203" text-anchor="middle" font-size="10.5" fill="#475569">Network (.json + lineage)</text>
+            </g>
+
+            <g class="svg-node" data-title="Offline Evolution Loop (evolve/)" data-badge="Review Note" data-desc="Runs offline in Node against held-out benchmarks (+1/0/-5). Recommendation: mutate concrete disambiguation rubric rules based on -5 failures, not just 5 discrete hyperparameters.">
+              <rect x="34" y="258" width="198" height="66" rx="10" fill="#ffffff" stroke="#64748b" stroke-width="1.4"/>
+              <text x="133" y="286" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a">Offline Evolution</text>
+              <text x="133" y="305" text-anchor="middle" font-size="10.5" fill="#475569">Pop 8 × 10 Gen · Held-out fit</text>
+            </g>
+
+            <!-- Community Validator Node -->
+            <g class="svg-node" data-title="Dialect Conformance Validator" data-badge="High Leverage" data-desc="Fills the explicit testing TODO in Cognizant's repo. Checks manifest, Neuro SAN JSON, links.json, CORS, front agent, and exports JSON reports. Ship v1 early to Discussions for maximum Impact.">
+              <rect x="34" y="420" width="198" height="72" rx="10" fill="#ffffff" stroke="#4f46e5" stroke-width="1.8"/>
+              <text x="133" y="451" text-anchor="middle" font-size="12" font-weight="700" fill="#312e81">Conformance Validator</text>
+              <text x="133" y="470" text-anchor="middle" font-size="10.5" fill="#4338ca">Checks any entrant's live URL</text>
+            </g>
+
+            <!-- Hospital B Nodes -->
+            <g class="svg-node" data-title="Explicit Origin Consent Gate" data-badge="Spec §3.2" data-desc="Before loading Hospital A's network, the browser displays A's origin and purpose and requires explicit visitor consent plus exact-name verification.">
+              <rect x="304" y="76" width="196" height="58" rx="10" fill="#ffffff" stroke="#0f766e" stroke-width="1.5"/>
+              <text x="402" y="101" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a">Origin Consent Gate</text>
+              <text x="402" y="119" text-anchor="middle" font-size="10.5" fill="#475569">Exact-name peer load check</text>
+            </g>
+
+            <g class="svg-node" data-title="HL7 v2 Batch / Local Code CSV" data-badge="Input" data-desc="Synthetic ORU^R01 messages (MSH-11=T) or real public MIMIC-IV d_labitems catalog loaded by Hospital B's interface analyst.">
+              <rect x="532" y="76" width="198" height="58" rx="10" fill="#ffffff" stroke="#64748b" stroke-width="1.5"/>
+              <text x="631" y="101" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a">HL7 Batch / Local CSV</text>
+              <text x="631" y="119" text-anchor="middle" font-size="10.5" fill="#475569">MSH-11=T · Synthetic / MIMIC</text>
+            </g>
+
+            <g class="svg-node" data-title="nsDeploy Browser Runtime" data-badge="Execution" data-desc="Runs the fetched Neuro SAN agent network locally inside Hospital B's browser tab. Coordinates parser, mapper agent, and deterministic unit guardrail.">
+              <rect x="304" y="168" width="196" height="64" rx="10" fill="#ffffff" stroke="#0f766e" stroke-width="1.8"/>
+              <text x="402" y="196" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a">nsDeploy Runtime</text>
+              <text x="402" y="214" text-anchor="middle" font-size="10.5" fill="#475569">Runs A's mapper locally in B</text>
+            </g>
+
+            <g class="svg-node" data-title="RECOMMENDED: Deterministic PHI Stripper" data-badge="Recommended Fix" data-desc="Plain TypeScript code that strips PID, PV1, NK1, and patient values BEFORE any LLM call, leaving only catalog metadata (OBX-3 code/name, OBX-6 unit, OBX-7 range). Defends privacy under real hospital scrutiny.">
+              <rect x="532" y="168" width="198" height="64" rx="10" fill="#ecfdf5" stroke="#059669" stroke-width="1.8"/>
+              <text x="631" y="194" text-anchor="middle" font-size="11.5" font-weight="700" fill="#065f46">+ Deterministic PHI Stripper</text>
+              <text x="631" y="213" text-anchor="middle" font-size="10.5" fill="#047857">Drops PID/PV1 before LLM call</text>
+            </g>
+
+            <g class="svg-node" data-title="Deterministic Unit &amp; UCUM Guardrail" data-badge="Safety Rule" data-desc="Plain code (never an LLM prompt) validating Mass/vol (mg/dL) vs Moles/vol (mmol/L) compatibility and site default unit convention (US vs SI).">
+              <rect x="304" y="264" width="196" height="64" rx="10" fill="#ffffff" stroke="#0f766e" stroke-width="1.5"/>
+              <text x="402" y="292" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a">Unit &amp; UCUM Guardrail</text>
+              <text x="402" y="310" text-anchor="middle" font-size="10.5" fill="#475569">Plain code · mg/dL vs mmol/L</text>
+            </g>
+
+            <g class="svg-node" data-title="Hospital B Private Alias Table (sly_data)" data-badge="Private Context" data-desc="Stores B's approved mappings and site unit convention. Never exposed to Origin A. Important: test both exact-match cache savings AND few-shot generalization on unseen codes.">
+              <rect x="532" y="264" width="198" height="64" rx="10" fill="#ffffff" stroke="#047857" stroke-width="1.8"/>
+              <text x="631" y="292" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a">B Private Alias Table</text>
+              <text x="631" y="310" text-anchor="middle" font-size="10.5" fill="#475569">sly_data · Exact + Few-Shot</text>
+            </g>
+
+            <g class="svg-node" data-title="Abstention Gate (+1 / 0 / -5)" data-badge="Core Mechanic" data-desc="Routes uncertain, missing-unit, or low-confidence items to 'Please check' (0 pts) with top-3 candidates and explanation instead of risking a -5 confident error.">
+              <rect x="304" y="360" width="196" height="62" rx="10" fill="#ffffff" stroke="#d97706" stroke-width="1.8"/>
+              <text x="402" y="387" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a">Abstention Gate</text>
+              <text x="402" y="405" text-anchor="middle" font-size="10.5" fill="#b45309">+1 right · 0 ask · -5 wrong</text>
+            </g>
+
+            <g class="svg-node" data-title="Interface Analyst Review Queue" data-badge="Human-in-Loop" data-desc="Human approves, fixes, or skips mappings. Every write uses a confirmed local site action displaying destination and arguments before saving.">
+              <rect x="532" y="360" width="198" height="62" rx="10" fill="#ffffff" stroke="#4338ca" stroke-width="1.6"/>
+              <text x="631" y="387" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a">Analyst Review Queue</text>
+              <text x="631" y="405" text-anchor="middle" font-size="10.5" fill="#475569">Approve / Fix / Skip</text>
+            </g>
+
+            <g class="svg-node" data-title="RECOMMENDED: Export FHIR ConceptMap / CSV" data-badge="UX Upgrade" data-desc="Turns Dialect from a browser-only demo into a practical hospital IT workbench: analysts export approved rules directly into Mirth Connect, Rhapsody, or Cloverleaf.">
+              <rect x="386" y="444" width="262" height="50" rx="10" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.8"/>
+              <text x="517" y="474" text-anchor="middle" font-size="12" font-weight="700" fill="#312e81">+ Export FHIR ConceptMap / CSV</text>
+            </g>
+
+            <!-- External LLM Nodes -->
+            <g class="svg-node" data-title="Default Same-Origin LLM Proxy" data-badge="Security Note" data-desc="Required by spec so judges run with no API key. MUST be schema-locked to lab-mapping payloads only, IP rate-limited, and hard-capped at provider level to prevent bot drain.">
+              <rect x="802" y="102" width="224" height="82" rx="10" fill="#ffffff" stroke="#d97706" stroke-width="1.6"/>
+              <text x="914" y="130" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a">Default No-Key Proxy</text>
+              <text x="914" y="149" text-anchor="middle" font-size="10.5" fill="#475569">Same-origin Vercel endpoint</text>
+              <text x="914" y="167" text-anchor="middle" font-size="10" font-weight="600" fill="#b45309">Schema-locked + Daily cap</text>
+            </g>
+
+            <g class="svg-node" data-title="Visitor BYOK Endpoint" data-badge="Spec §4 &amp; §6" data-desc="Visitor's own OpenAI-compatible or Otari key stays strictly in browser memory/settings; never sent to Hospital A, never logged, never placed in manifests or URLs.">
+              <rect x="802" y="218" width="224" height="82" rx="10" fill="#ffffff" stroke="#d97706" stroke-width="1.6"/>
+              <text x="914" y="246" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a">Visitor BYOK Endpoint</text>
+              <text x="914" y="265" text-anchor="middle" font-size="10.5" fill="#475569">Hospital's own cloud AI router</text>
+              <text x="914" y="283" text-anchor="middle" font-size="10" font-weight="600" fill="#047857">Key NEVER reaches Peer A</text>
+            </g>
+
+            <g class="svg-node" data-title="Optional Local / On-Prem LLM" data-badge="Zero-Egress Path" data-desc="Pointing BYOK at an OpenAI-compatible local/on-prem endpoint (e.g., Ollama / hospital GPU) achieves true zero-network egress for real clinical deployments.">
+              <rect x="802" y="344" width="224" height="82" rx="10" fill="#f8fafc" stroke="#64748b" stroke-width="1.4" stroke-dasharray="5 4"/>
+              <text x="914" y="372" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a">On-Prem / Local LLM</text>
+              <text x="914" y="391" text-anchor="middle" font-size="10.5" fill="#475569">Future / BYOK Local URL</text>
+              <text x="914" y="409" text-anchor="middle" font-size="10" font-weight="600" fill="#0f766e">True zero-egress deployment</text>
+            </g>
+
+            <!-- Connectors -->
+            <!-- Evolution -> Network -->
+            <path d="M 133 258 L 133 224" stroke="#64748b" stroke-width="1.6" fill="none" marker-end="url(#arrow-slate)"/>
+            <!-- Network -> Consent Gate -->
+            <path d="M 232 189 C 266 189, 266 105, 302 105" stroke="#0f766e" stroke-width="2" fill="none" marker-end="url(#arrow-teal)"/>
+            <rect x="237" y="131" width="60" height="18" rx="4" fill="#ffffff" stroke="#99f6e4"/>
+            <text x="267" y="143" text-anchor="middle" font-size="9.5" font-weight="700" fill="#0f766e">Public JSON</text>
+            <!-- Consent -> Runtime -->
+            <path d="M 402 134 L 402 166" stroke="#0f766e" stroke-width="1.8" fill="none" marker-end="url(#arrow-teal)"/>
+            <!-- HL7 -> PHI Stripper -->
+            <path d="M 631 134 L 631 166" stroke="#64748b" stroke-width="1.8" fill="none" marker-end="url(#arrow-slate)"/>
+            <!-- PHI Stripper -> Alias Table -->
+            <path d="M 631 232 L 631 262" stroke="#0f766e" stroke-width="1.8" fill="none" marker-end="url(#arrow-teal)"/>
+            <!-- Alias Table <-> Unit Guardrail -->
+            <path d="M 532 296 L 502 296" stroke="#0f766e" stroke-width="1.6" fill="none" marker-end="url(#arrow-teal)"/>
+            <!-- Runtime <-> Unit Guardrail -->
+            <path d="M 402 232 L 402 262" stroke="#0f766e" stroke-width="1.8" fill="none" marker-end="url(#arrow-teal)"/>
+            <!-- Unit Guardrail -> Abstention -->
+            <path d="M 402 328 L 402 358" stroke="#d97706" stroke-width="1.8" fill="none" marker-end="url(#arrow-amber)"/>
+            <!-- Abstention -> Review Queue -->
+            <path d="M 500 391 L 530 391" stroke="#4f46e5" stroke-width="1.8" fill="none" marker-end="url(#arrow-indigo)"/>
+            <!-- Review Queue -> Alias Table (feedback) -->
+            <path d="M 664 360 L 664 330" stroke="#047857" stroke-width="1.8" fill="none" marker-end="url(#arrow-teal)"/>
+            <!-- Review Queue -> Export -->
+            <path d="M 631 422 C 631 438, 600 444, 578 444" stroke="#4f46e5" stroke-width="1.8" fill="none" marker-end="url(#arrow-indigo)"/>
+            <!-- Runtime -> External LLM (dashed egress) -->
+            <path d="M 500 182 C 620 144, 710 144, 800 144" stroke="#d97706" stroke-width="1.8" stroke-dasharray="6 4" fill="none" marker-end="url(#arrow-amber)"/>
+            <path d="M 500 212 C 640 245, 720 258, 800 258" stroke="#d97706" stroke-width="1.8" stroke-dasharray="6 4" fill="none" marker-end="url(#arrow-amber)"/>
+            <!-- Validator checks -->
+            <path d="M 133 420 C 133 368, 22 368, 22 97 L 32 97" stroke="#4f46e5" stroke-width="1.4" stroke-dasharray="4 3" fill="none" marker-end="url(#arrow-indigo)"/>
+            <path d="M 232 456 L 282 456" stroke="#4f46e5" stroke-width="1.4" stroke-dasharray="4 3" fill="none" marker-end="url(#arrow-indigo)"/>
+          </svg>
+        </div>
+
+        <!-- Diagram 2: Decision & Adaptation Loop -->
+        <div class="svg-wrap hidden" id="diag-loop">
+          <svg viewBox="0 0 1060 395" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Dialect Abstention and Per-Site Adaptation Decision Loop">
+            <defs>
+              <marker id="l-teal" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#0f766e"/>
+              </marker>
+              <marker id="l-emerald" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#059669"/>
+              </marker>
+              <marker id="l-amber" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#d97706"/>
+              </marker>
+              <marker id="l-indigo" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                <path d="M 0 1 L 10 5 L 0 9 z" fill="#4f46e5"/>
+              </marker>
+            </defs>
+
+            <!-- Top Fast-Path Band -->
+            <rect x="380" y="18" width="420" height="78" rx="12" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.4" stroke-dasharray="5 4"/>
+            <text x="396" y="38" font-size="11" font-weight="700" fill="#047857">PATH A: REPEAT-CODE CACHE (WORKLOAD REDUCTION)</text>
+
+            <g class="svg-node" data-title="Deterministic Exact Match (Alias Hit)" data-badge="0 LLM Tokens" data-desc="When Hospital B sees a local code already approved by an analyst, the alias table returns it instantly at zero LLM cost. Great for real utility—report separately from unseen-code generalization!">
+              <rect x="396" y="47" width="214" height="38" rx="8" fill="#ffffff" stroke="#059669" stroke-width="1.6"/>
+              <text x="503" y="70" text-anchor="middle" font-size="11.5" font-weight="700" fill="#065f46">Exact Alias Match (0 Tokens)</text>
+            </g>
+
+            <g class="svg-node" data-title="Approved Output / ConceptMap" data-badge="Output" data-desc="Verified local-to-LOINC entry ready for FHIR ConceptMap or CSV export into hospital interface engines.">
+              <rect x="640" y="47" width="144" height="38" rx="8" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.6"/>
+              <text x="712" y="70" text-anchor="middle" font-size="11.5" font-weight="700" fill="#312e81">ConceptMap Export</text>
+            </g>
+
+            <!-- Main Row: Unseen Code Pipeline -->
+            <g class="svg-node" data-title="Stripped Catalog Item" data-badge="Step 1" data-desc="De-identified metadata only: local code (e.g. GLU-F), label, specimen/fluid, unit (mmol/L), reference range—zero patient identifiers.">
+              <rect x="20" y="142" width="156" height="72" rx="10" fill="#ffffff" stroke="#64748b" stroke-width="1.6"/>
+              <text x="98" y="172" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a">1. Stripped Input</text>
+              <text x="98" y="191" text-anchor="middle" font-size="10.5" fill="#475569">Code · Label · Unit</text>
+            </g>
+
+            <g class="svg-node" data-title="Private Alias Lookup" data-badge="Step 2" data-desc="Checks whether this exact local code already exists in Hospital B's private alias table before invoking any LLM.">
+              <rect x="208" y="142" width="144" height="72" rx="10" fill="#f0fdfa" stroke="#0f766e" stroke-width="1.8"/>
+              <text x="280" y="172" text-anchor="middle" font-size="12" font-weight="700" fill="#0f766e">2. Known in B</text>
+              <text x="280" y="191" text-anchor="middle" font-size="10.5" fill="#0f766e">Alias Table?</text>
+            </g>
+
+            <g class="svg-node" data-title="Deterministic UCUM Unit Filter" data-badge="Step 3 · Plain Code" data-desc="Filters LOINC candidates by compatible property (Mass/vol vs Moles/vol) using explicit unit or Hospital B's default unit system (US vs SI). Fixes the MIMIC missing-unit trap.">
+              <rect x="386" y="142" width="176" height="72" rx="10" fill="#ffffff" stroke="#0f766e" stroke-width="1.6"/>
+              <text x="474" y="172" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a">3. UCUM Unit Filter</text>
+              <text x="474" y="191" text-anchor="middle" font-size="10.5" fill="#475569">Plain code + Site unit mode</text>
+            </g>
+
+            <g class="svg-node" data-title="Candidate Retrieval + B's Few-Shot Dialect Hints" data-badge="Step 4 · Adaptation" data-desc="Combines top-k LOINC candidates with examples of Hospital B's approved naming patterns (e.g. 'WB'=Whole Blood, 'F-'=Fasting) to generalize to UNSEEN local codes.">
+              <rect x="596" y="142" width="204" height="72" rx="10" fill="#ffffff" stroke="#4f46e5" stroke-width="1.6"/>
+              <text x="698" y="172" text-anchor="middle" font-size="12" font-weight="700" fill="#0f172a">4. Retrieval + B Hints</text>
+              <text x="698" y="191" text-anchor="middle" font-size="10.5" fill="#4338ca">Top-k LOINC + Few-Shot</text>
+            </g>
+
+            <g class="svg-node" data-title="Evolved Mapper &amp; Abstention Gate" data-badge="Step 5 · +1 / 0 / -5" data-desc="Evaluates candidate match against evolved disambiguation rubric and confidence threshold. Missing units or near-ties trigger Abstain (0 pts) instead of risking -5.">
+              <rect x="834" y="142" width="204" height="72" rx="10" fill="#fffbeb" stroke="#d97706" stroke-width="1.8"/>
+              <text x="936" y="172" text-anchor="middle" font-size="12" font-weight="700" fill="#92400e">5. Mapper &amp; Gate</text>
+              <text x="936" y="191" text-anchor="middle" font-size="10.5" fill="#b45309">Confident vs. Abstain</text>
+            </g>
+
+            <!-- Bottom Row: Human Review & Learning Loop -->
+            <g class="svg-node" data-title="Human-Confirmed Local Write (Site Action)" data-badge="Spec §3.1" data-desc="Approved mappings write ONLY to Hospital B's private alias table after showing destination and arguments. Feeds both exact cache and future few-shot dialect hints.">
+              <rect x="208" y="286" width="254" height="72" rx="10" fill="#ecfdf5" stroke="#047857" stroke-width="1.8"/>
+              <text x="335" y="316" text-anchor="middle" font-size="12" font-weight="700" fill="#065f46">Update B Private Alias Table</text>
+              <text x="335" y="335" text-anchor="middle" font-size="10.5" fill="#047857">Confirmed Site Action · Stays in B</text>
+            </g>
+
+            <g class="svg-node" data-title="Abstain Pile: Please Check (0 pts)" data-badge="Safety Win" data-desc="Surfaces top-3 LOINC candidates plus explicit reason (e.g., 'Unit missing; could be 1558-6 or 14771-0') so the analyst resolves only ambiguous items.">
+              <rect x="546" y="286" width="224" height="72" rx="10" fill="#fffbeb" stroke="#d97706" stroke-width="1.6"/>
+              <text x="658" y="316" text-anchor="middle" font-size="12" font-weight="700" fill="#92400e">Abstain Queue (0 pts)</text>
+              <text x="658" y="335" text-anchor="middle" font-size="10.5" fill="#b45309">Top-3 candidates + reason</text>
+            </g>
+
+            <g class="svg-node" data-title="Confident Proposal (+1 Right / -5 Wrong)" data-badge="Scored Output" data-desc="Auto-proposed mapping queued for rapid batch approval. Any confident error incurs a heavy -5 penalty during offline evolution and benchmarking.">
+              <rect x="814" y="286" width="224" height="72" rx="10" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.6"/>
+              <text x="926" y="316" text-anchor="middle" font-size="12" font-weight="700" fill="#312e81">Proposed Match (+1 / -5)</text>
+              <text x="926" y="335" text-anchor="middle" font-size="10.5" fill="#4338ca">Human approval before write</text>
+            </g>
+
+            <!-- Arrows -->
+            <path d="M 176 178 L 206 178" stroke="#0f766e" stroke-width="1.8" fill="none" marker-end="url(#l-teal)"/>
+            <!-- Yes branch up -->
+            <path d="M 280 142 L 280 66 L 394 66" stroke="#059669" stroke-width="1.8" fill="none" marker-end="url(#l-emerald)"/>
+            <text x="292" y="102" font-size="10.5" font-weight="700" fill="#047857">YES</text>
+            <path d="M 610 66 L 638 66" stroke="#059669" stroke-width="1.8" fill="none" marker-end="url(#l-emerald)"/>
+            <!-- No branch right -->
+            <path d="M 352 178 L 384 178" stroke="#0f766e" stroke-width="1.8" fill="none" marker-end="url(#l-teal)"/>
+            <text x="357" y="169" font-size="10" font-weight="700" fill="#475569">NO</text>
+            <path d="M 562 178 L 594 178" stroke="#0f766e" stroke-width="1.8" fill="none" marker-end="url(#l-teal)"/>
+            <path d="M 800 178 L 832 178" stroke="#4f46e5" stroke-width="1.8" fill="none" marker-end="url(#l-indigo)"/>
+            <!-- Gate splits down -->
+            <path d="M 884 214 C 884 252, 658 242, 658 284" stroke="#d97706" stroke-width="1.8" fill="none" marker-end="url(#l-amber)"/>
+            <text x="720" y="252" font-size="10.5" font-weight="700" fill="#b45309">Unsure → Ask Human</text>
+            <path d="M 960 214 L 960 284" stroke="#4f46e5" stroke-width="1.8" fill="none" marker-end="url(#l-indigo)"/>
+            <text x="970" y="255" font-size="10.5" font-weight="700" fill="#4338ca">High Conf.</text>
+            <!-- Human approves -> Alias Table -->
+            <path d="M 546 322 L 464 322" stroke="#059669" stroke-width="1.8" fill="none" marker-end="url(#l-emerald)"/>
+            <path d="M 926 358 L 926 382 L 335 382 L 335 360" stroke="#059669" stroke-width="1.6" fill="none" marker-end="url(#l-emerald)"/>
+            <!-- Alias table feeds back to Lookup AND Few-Shot -->
+            <path d="M 280 286 L 280 216" stroke="#059669" stroke-width="1.8" fill="none" marker-end="url(#l-emerald)"/>
+            <path d="M 412 286 C 412 246, 616 246, 636 216" stroke="#4f46e5" stroke-width="1.6" stroke-dasharray="5 4" fill="none" marker-end="url(#l-indigo)"/>
+            <text x="458" y="254" font-size="10" font-weight="700" fill="#4338ca">Few-shot generalization</text>
+          </svg>
+        </div>
+
+        <!-- Inspector bar -->
+        <div class="inspector" id="inspector">
+          <span class="inspector-badge" id="ins-badge">Architecture Tip</span>
+          <div class="inspector-text" id="ins-text">
+            <strong>Click any node above</strong> to inspect its exact specification role, privacy boundary, or recommended pre-build upgrade. Highlighted boxes in green/indigo mark high-value additions identified in this review.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Effectiveness & Usefulness -->
+    <section id="effectiveness">
+      <div class="sec-head">
+        <div>
+          <h2>3. Deep Effectiveness &amp; Real-World Usefulness Audit</h2>
+          <p>The four technical blind spots most likely to affect Gate G2 or draw tough judge questions.</p>
+        </div>
+      </div>
+
+      <div class="finding-grid">
+        <article class="finding-card critical">
+          <span class="finding-tag">Critical Scientific Trap</span>
+          <h3>1. Trivial Alias Caching vs. Real Adaptation</h3>
+          <p>
+            If Hospital B’s held-out evaluation repeats local codes the analyst already approved, an alias lookup table recovers accuracy trivially—like any hash map, not AI adaptation.
+          </p>
+          <div class="fix-box">
+            <strong>Fix:</strong> Split Transfer metrics into (a) <em>Repeat-code cache savings</em> (0 tokens) and (b) <em>Unseen-code generalization</em> where B’s approved examples teach B’s naming conventions on brand-new codes.
+          </div>
+        </article>
+
+        <article class="finding-card critical">
+          <span class="finding-tag">Critical Benchmark Trap</span>
+          <h3>2. MIMIC-IV <code>d_labitems</code> Has No Units</h3>
+          <p>
+            The flagship example distinguishes <code>1558-6</code> (mg/dL) from <code>14771-0</code> (mmol/L) via units—yet MIMIC-IV Demo v1.0 <code>d_labitems</code> only has <code>label</code>, <code>fluid</code>, <code>category</code>, and <code>loinc_code</code> (no unit column).
+          </p>
+          <div class="fix-box">
+            <strong>Fix:</strong> Turn this into a feature! Show Dialect rightly abstains when unit convention is unknown, then recovers coverage once Hospital R’s site dialect sets <em>US conventional units</em>.
+          </div>
+        </article>
+
+        <article class="finding-card">
+          <span class="finding-tag">Kill-Rule &amp; Baseline Risk</span>
+          <h3>3. Evolution vs. Hyperparameter Grid Search</h3>
+          <p>
+            Searching 5 knobs across 8×10 = 80 runs risks looking like simple grid search, and beating only a forced-choice single LLM call by +0.6 pts may look like a strawman baseline.
+          </p>
+          <div class="fix-box">
+            <strong>Fix:</strong> Test against <em>both</em> forced-choice AND abstain-prompted single-call baselines, and let evolution mutate concrete disambiguation rubric rules driven by <code>-5</code> error traces.
+          </div>
+        </article>
+
+        <article class="finding-card opportunity">
+          <span class="finding-tag">Privacy &amp; Consistency Fix</span>
+          <h3>4. "Data Never Leaves" vs. Cloud LLM API</h3>
+          <p>
+            <code>README.md</code> says hospital data never leaves, whereas <code>idea-summary.md</code> warns data still goes to the chosen LLM endpoint. Sending raw HL7 <code>PID</code> segments to a cloud API breaks HIPAA assumptions.
+          </p>
+          <div class="fix-box">
+            <strong>Fix:</strong> Add a deterministic client-side <strong>PHI stripper</strong> (drops <code>PID/PV1/NK1</code> before LLM calls) and harmonize all copy: <em>"never reaches peer sites; stripped metadata only reaches your chosen LLM router."</em>
+          </div>
+        </article>
+      </div>
+
+      <div class="callout">
+        <div class="callout-icon">🏥</div>
+        <div>
+          <h4>Real-World Usefulness Verdict: Frame as a Mapping Workbench, Not a Live Clinical Router</h4>
+          <p>
+            Real hospitals never pipe live patient HL7 streams through an analyst’s Chrome tab—interface engines (Mirth Connect, Rhapsody, Cloverleaf) run pre-approved tables server-side. Positioning Dialect as a <strong>zero-install onboarding &amp; LIS-migration drift workbench</strong> that ends with a <strong>1-click FHIR <code>ConceptMap</code> / CSV export</strong> aligns cleanly with both browser-tab constraints and real hospital IT operations.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pros & Cons -->
+    <section id="pros-cons">
+      <div class="sec-head">
+        <div>
+          <h2>4. Detailed Pros &amp; Cons</h2>
+          <p>Filter strengths and weaknesses by dimension.</p>
+        </div>
+      </div>
+
+      <div class="filter-row" role="group" aria-label="Filter pros and cons">
+        <button class="filter-pill active" type="button" data-filter="all">All Categories</button>
+        <button class="filter-pill" type="button" data-filter="concept">Concept &amp; Strategy</button>
+        <button class="filter-pill" type="button" data-filter="tech">Technical &amp; Scientific</button>
+        <button class="filter-pill" type="button" data-filter="privacy">Privacy &amp; Security</button>
+        <button class="filter-pill" type="button" data-filter="scope">Product &amp; Scope</button>
+      </div>
+
+      <div class="pros-cons-grid">
+        <div class="pc-column">
+          <div class="pc-header">
+            <h3 style="color: var(--emerald);">Strengths (Pros)</h3>
+            <span class="pill" id="pro-count">9 items</span>
+          </div>
+
+          <div class="pc-item pro" data-cat="concept">
+            <div class="pc-meta">Concept &amp; Strategy</div>
+            <h4>Natural Fit to the Open Agentic Web Spec</h4>
+            <p>Public agent network + browser runtime + private <code>sly_data</code> maps cleanly onto shared mapping intelligence + private hospital code dialects.</p>
+          </div>
+          <div class="pc-item pro" data-cat="concept">
+            <div class="pc-meta">Concept &amp; Strategy</div>
+            <h4>Authentic Alignment with All Three Judges</h4>
+            <p>Naturally resonates with evolutionary AI (Miikkulainen), Neuro SAN / zero-error verification (Hodjat), and privacy-preserving decentralized agents (Raskar).</p>
+          </div>
+          <div class="pc-item pro" data-cat="concept">
+            <div class="pc-meta">Concept &amp; Strategy</div>
+            <h4>High-Leverage Community Conformance Validator</h4>
+            <p>Fills an explicit empty <code>TODO</code> in Cognizant’s repo—scoring under both <em>Technological Implementation</em> and <em>Potential Impact</em>.</p>
+          </div>
+          <div class="pc-item pro" data-cat="tech">
+            <div class="pc-meta">Technical &amp; Scientific</div>
+            <h4>Pre-Registered Numeric Kill Rule (Gate G2)</h4>
+            <p>Locking threshold targets before building prevents sunk-cost bias and demonstrates rare experimental discipline.</p>
+          </div>
+          <div class="pc-item pro" data-cat="tech">
+            <div class="pc-meta">Technical &amp; Scientific</div>
+            <h4>Real Public Benchmark (MIMIC-IV Demo v1.0)</h4>
+            <p>Testing on 269 real hospital-assigned LOINC mappings avoids the common hackathon trap of grading only on self-invented toy puzzles.</p>
+          </div>
+          <div class="pc-item pro" data-cat="tech">
+            <div class="pc-meta">Technical &amp; Scientific</div>
+            <h4>Deterministic Code for Safety-Critical Rules</h4>
+            <p>Enforcing unit conversion and valid ranges in plain TypeScript—not LLM prompt instructions—reflects sound safety engineering.</p>
+          </div>
+          <div class="pc-item pro" data-cat="tech">
+            <div class="pc-meta">Technical &amp; Scientific</div>
+            <h4>Clinically Legible Payoff (+1 / 0 / -5)</h4>
+            <p>Asymmetric scoring makes abstention measurable as points saved rather than hand-wavy caution.</p>
+          </div>
+          <div class="pc-item pro" data-cat="privacy">
+            <div class="pc-meta">Privacy &amp; Security</div>
+            <h4>Strict Synthetic Hygiene &amp; Single Facts Source</h4>
+            <p><code>MSH-11=T</code>, <code>SYNTHETIC^PATIENT</code>, <code>facts.md</code>, and honest disclaimers defend effectively against automated AI screeners.</p>
+          </div>
+          <div class="pc-item pro" data-cat="scope">
+            <div class="pc-meta">Product &amp; Scope</div>
+            <h4>Clean Multi-License Separation</h4>
+            <p>MIT code kept distinct from ODbL data and LOINC terms shows mature open-source compliance.</p>
+          </div>
+        </div>
+
+        <div class="pc-column">
+          <div class="pc-header">
+            <h3 style="color: var(--rose);">Weaknesses &amp; Risks (Cons)</h3>
+            <span class="pill" id="con-count">9 items</span>
+          </div>
+
+          <div class="pc-item con" data-cat="tech">
+            <div class="pc-meta">Technical &amp; Scientific</div>
+            <h4>MIMIC <code>d_labitems</code> Lacks Measurement Units</h4>
+            <p>Could create confusing abstention spikes on Mass-vs-Moles tests unless hospital unit convention is explicitly represented in site context.</p>
+          </div>
+          <div class="pc-item con" data-cat="tech">
+            <div class="pc-meta">Technical &amp; Scientific</div>
+            <h4>Evolution May Look Like Simple Grid Search</h4>
+            <p>80 evaluations over 5 basic levers may not clearly outperform a well-prompted single LLM call with abstention + unit guardrails.</p>
+          </div>
+          <div class="pc-item con" data-cat="tech">
+            <div class="pc-meta">Technical &amp; Scientific</div>
+            <h4>Cache vs. Generalization Ambiguity</h4>
+            <p>If transfer recovery mainly reflects exact hits in the alias table, it proves caching rather than dialect adaptation.</p>
+          </div>
+          <div class="pc-item con" data-cat="privacy">
+            <div class="pc-meta">Privacy &amp; Security</div>
+            <h4>Contradictory Privacy Claims Across Docs</h4>
+            <p><code>README.md</code> implies data never leaves, conflicting with <code>idea-summary.md</code> regarding cloud LLM inference egress.</p>
+          </div>
+          <div class="pc-item con" data-cat="privacy">
+            <div class="pc-meta">Privacy &amp; Security</div>
+            <h4>Public No-Key Endpoint Abuse Risk</h4>
+            <p>Without strict schema-locking (lab mapping payloads only), per-IP rate limiting, and provider caps, bots can exhaust the daily LLM budget before judges visit.</p>
+          </div>
+          <div class="pc-item con" data-cat="privacy">
+            <div class="pc-meta">Privacy &amp; Security</div>
+            <h4>ODbL Share-Alike Contamination Hazard</h4>
+            <p>MIMIC rows must never enter few-shot prompts embedded in the MIT-licensed evolved network JSON—keep MIMIC strictly held-out for evaluation.</p>
+          </div>
+          <div class="pc-item con" data-cat="scope">
+            <div class="pc-meta">Product &amp; Scope</div>
+            <h4>130–160 Hours of Scope in an 84-Hour Budget</h4>
+            <p>Two Vercel origins, nsDeploy integration, Validator v1/v2, evolution, 4 scenarios, 7 experiments, user tests, and video over Christmas/New Year is heavily compressed.</p>
+          </div>
+          <div class="pc-item con" data-cat="scope">
+            <div class="pc-meta">Product &amp; Scope</div>
+            <h4>Missing Export Deliverable for Interface Analysts</h4>
+            <p>Mappings currently stop in browser storage; adding 1-click FHIR <code>ConceptMap</code> / CSV export makes the workflow concretely deployable.</p>
+          </div>
+          <div class="pc-item con" data-cat="concept">
+            <div class="pc-meta">Concept &amp; Strategy</div>
+            <h4>Minor Doc Drift Already Present</h4>
+            <p><code>idea-summary.md</code> still says "all three hospital sites" and <code>/sites/hospital-c</code> remains despite <code>PLAN.md</code> narrowing default scope to two hospitals.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Judging Matrix -->
+    <section id="judging">
+      <div class="sec-head">
+        <div>
+          <h2>5. Hackathon Judging Readiness Audit</h2>
+          <p>Mapped directly to the Open Agentic Web Challenge criteria (tie-breaker: Technological Implementation).</p>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 22%;">Criterion</th>
+              <th style="width: 15%;">Current Readiness</th>
+              <th style="width: 31%;">What Is Already Strong</th>
+              <th style="width: 32%;">Single Highest-Impact Upgrade (to Reach 9–10/10)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Stage One (Pass/Fail)</strong></td>
+              <td><span class="status-chip chip-green">Very Strong</span></td>
+              <td>Every MUST item tracked: Neuro SAN JSON, <code>links.json</code>, no-key default router, CORS, consent, and 4 visible error stops.</td>
+              <td>Schema-lock the no-key proxy against prompt abuse and verify <code>nsDeploy</code> cross-origin behavior in P2 (don’t defer to P3).</td>
+            </tr>
+            <tr>
+              <td><strong>Technological Implementation</strong></td>
+              <td><span class="status-chip chip-teal">Strong</span></td>
+              <td>Multi-agent pipeline + plain-code unit checks + live conformance panel + standalone validator.</td>
+              <td>Add deterministic client-side <strong>PHI stripper</strong> and let evolution mutate concrete disambiguation rules from <code>-5</code> failure traces.</td>
+            </tr>
+            <tr>
+              <td><strong>Design</strong></td>
+              <td><span class="status-chip chip-teal">Good</span></td>
+              <td>Clear end-to-end persona journey (Ana: batch → 3 piles → review queue → rising accuracy) + planned 3-user timing test.</td>
+              <td>Add <strong>1-click Export as FHIR <code>ConceptMap</code> / CSV</strong> so the journey finishes with a real artifact for Mirth/Rhapsody.</td>
+            </tr>
+            <tr>
+              <td><strong>Potential Impact</strong></td>
+              <td><span class="status-chip chip-green">Very Strong</span></td>
+              <td>Sourced AHRQ data, MIMIC real-world benchmark, real hospital IT practitioner quote, shared open tools.</td>
+              <td>Release <strong>Conformance Validator v1 early</strong> (mid-December) in GitHub Discussions so other entrants actually use and cite it before judging.</td>
+            </tr>
+            <tr>
+              <td><strong>Quality of the Idea</strong></td>
+              <td><span class="status-chip chip-amber">Promising</span></td>
+              <td>Memorable "hospital dialect" hook, clear "why not central SaaS?" argument, honest clinical limits.</td>
+              <td>Prove <strong>unseen-code dialect generalization</strong> (not just exact alias caching) in the transfer curve so the scientific thesis is airtight.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Action Plan -->
+    <section id="actions">
+      <div class="sec-head">
+        <div>
+          <h2>6. Prioritized Action Plan (Before Gate G1 · 25 Nov)</h2>
+          <p>Six low-effort changes that remove the biggest judge objections before coding begins.</p>
+        </div>
+        <span class="progress-note" id="check-progress">0 / 6 completed</span>
+      </div>
+
+      <div class="checklist" id="checklist">
+        <label class="check-item" data-id="act-1">
+          <input type="checkbox" />
+          <div>
+            <div class="check-title">1. Harmonize privacy wording &amp; add deterministic PHI stripping</div>
+            <div class="check-desc">Update <code>README.md</code> to state data never reaches peer sites and patient identifiers never leave the browser; strip <code>PID/PV1/NK1</code> in plain TypeScript before any LLM call.</div>
+          </div>
+        </label>
+
+        <label class="check-item" data-id="act-2">
+          <input type="checkbox" />
+          <div>
+            <div class="check-title">2. Measure unseen-code generalization in the P1 transfer spike</div>
+            <div class="check-desc">Report exact-alias cache savings separately from held-out <em>unseen</em> local codes at Hospital B where few-shot hints teach B’s naming conventions.</div>
+          </div>
+        </label>
+
+        <label class="check-item" data-id="act-3">
+          <input type="checkbox" />
+          <div>
+            <div class="check-title">3. Add an abstain-prompted single-LLM baseline in P1</div>
+            <div class="check-desc">Benchmark against both forced-choice (LabBridge-style) and abstain-prompted single-call baselines so the +0.6 kill-rule win is indisputable.</div>
+          </div>
+        </label>
+
+        <label class="check-item" data-id="act-4">
+          <input type="checkbox" />
+          <div>
+            <div class="check-title">4. Resolve the MIMIC <code>d_labitems</code> missing-unit gap in P0</div>
+            <div class="check-desc">Inspect the 269 LOINC-coded MIMIC rows for Mass-vs-Moles dependence and explicitly model hospital default unit convention (US conventional vs. SI) as site dialect context.</div>
+          </div>
+        </label>
+
+        <label class="check-item" data-id="act-5">
+          <input type="checkbox" />
+          <div>
+            <div class="check-title">5. Add 1-click FHIR <code>ConceptMap</code> / CSV export to the review screen</div>
+            <div class="check-desc">Small UI feature that turns the browser demo into a practical interface-analyst workbench for Mirth Connect, Rhapsody, or Cloverleaf.</div>
+          </div>
+        </label>
+
+        <label class="check-item" data-id="act-6">
+          <input type="checkbox" />
+          <div>
+            <div class="check-title">6. Lock scope early to protect the 84-hour holiday budget</div>
+            <div class="check-desc">Formally demote S4 (eICU intake), Validator v2 live checks, and Hospital C to stretch now; ship Hospital A↔B (S1), MIMIC (S2), Drift (S3), and Validator v1 rock-solid and early.</div>
+          </div>
+        </label>
+      </div>
+    </section>
+
+    <footer>
+      <div><strong>Dialect Pre-Build Review</strong> · Standalone shareable report (zero external scripts or tracking)</div>
+      <div>Reviewed with Google Gemini 4 Neon (high reasoning) · Synthetic scenario · 24 Nov 2026</div>
+    </footer>
+  </main>
+
+  <script>
+    // Theme toggle
+    const themeBtn = document.getElementById('themeBtn');
+    const root = document.documentElement;
+    const savedTheme = localStorage.getItem('dialect-review-theme');
+    if (savedTheme === 'dark') {
+      root.setAttribute('data-theme', 'dark');
+      themeBtn.textContent = 'Light Mode';
+    }
+    themeBtn.addEventListener('click', () => {
+      const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      themeBtn.textContent = next === 'dark' ? 'Light Mode' : 'Dark Mode';
+      localStorage.setItem('dialect-review-theme', next);
+    });
+
+    // Diagram switcher
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const diagArch = document.getElementById('diag-arch');
+    const diagLoop = document.getElementById('diag-loop');
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const target = btn.dataset.diagram;
+        diagArch.classList.toggle('hidden', target !== 'arch');
+        diagLoop.classList.toggle('hidden', target !== 'loop');
+      });
+    });
+
+    // Interactive SVG node inspector
+    const nodes = document.querySelectorAll('.svg-node');
+    const insBadge = document.getElementById('ins-badge');
+    const insText = document.getElementById('ins-text');
+    nodes.forEach(node => {
+      node.addEventListener('click', () => {
+        nodes.forEach(n => n.classList.remove('selected'));
+        node.classList.add('selected');
+        insBadge.textContent = node.dataset.badge || 'Component';
+        insText.innerHTML = '<strong>' + node.dataset.title + ':</strong> ' + node.dataset.desc;
+      });
+    });
+
+    // Pros & Cons category filter
+    const filterPills = document.querySelectorAll('.filter-pill');
+    const pcItems = document.querySelectorAll('.pc-item');
+    const proCount = document.getElementById('pro-count');
+    const conCount = document.getElementById('con-count');
+    filterPills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        filterPills.forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        const cat = pill.dataset.filter;
+        let pros = 0, cons = 0;
+        pcItems.forEach(item => {
+          const show = cat === 'all' || item.dataset.cat === cat;
+          item.classList.toggle('hidden', !show);
+          if (show) {
+            if (item.classList.contains('pro')) pros++;
+            else cons++;
+          }
+        });
+        proCount.textContent = pros + (pros === 1 ? ' item' : ' items');
+        conCount.textContent = cons + (cons === 1 ? ' item' : ' items');
+      });
+    });
+
+    // Persistent Gate G1 checklist
+    const checkItems = document.querySelectorAll('.check-item');
+    const progressEl = document.getElementById('check-progress');
+    function updateChecklistUI() {
+      let done = 0;
+      checkItems.forEach(item => {
+        const cb = item.querySelector('input');
+        item.classList.toggle('done', cb.checked);
+        if (cb.checked) done++;
+      });
+      progressEl.textContent = done + ' / ' + checkItems.length + ' completed';
+    }
+    checkItems.forEach(item => {
+      const cb = item.querySelector('input');
+      const key = 'dialect-check-' + item.dataset.id;
+      if (localStorage.getItem(key) === '1') cb.checked = true;
+      cb.addEventListener('change', () => {
+        localStorage.setItem(key, cb.checked ? '1' : '0');
+        updateChecklistUI();
+      });
+    });
+    updateChecklistUI();
+  </script>
+</body>
+</html>
