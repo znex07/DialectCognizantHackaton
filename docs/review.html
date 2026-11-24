@@ -696,12 +696,314 @@
       color: var(--text-soft);
     }
 
+    /* New Tab & Notification Pill */
+    .notif-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.66rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #059669, #0f766e);
+      color: #ffffff;
+      line-height: 1.3;
+      box-shadow: 0 2px 8px rgba(15, 118, 110, 0.32);
+      vertical-align: middle;
+    }
+    [data-theme="dark"] .notif-pill {
+      background: linear-gradient(135deg, #34d399, #2dd4bf);
+      color: #042f2e;
+      box-shadow: 0 2px 10px rgba(45, 212, 191, 0.35);
+    }
+    .notif-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #fef08a;
+      box-shadow: 0 0 0 0 rgba(254, 240, 138, 0.8);
+      animation: notifPulse 1.9s infinite;
+    }
+    [data-theme="dark"] .notif-dot {
+      background: #042f2e;
+      box-shadow: 0 0 0 0 rgba(4, 47, 46, 0.7);
+    }
+    @keyframes notifPulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(254, 240, 138, 0.75); }
+      70% { transform: scale(1.05); box-shadow: 0 0 0 6px rgba(254, 240, 138, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(254, 240, 138, 0); }
+    }
+    .nav-links a.nav-tab-new {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--primary);
+      background: var(--primary-bg);
+      border: 1px solid var(--primary-border);
+      font-weight: 700;
+    }
+    .nav-links a.nav-tab-new:hover,
+    .nav-links a.nav-tab-new.active-nav {
+      background: var(--primary);
+      color: #ffffff;
+      border-color: var(--primary);
+    }
+    [data-theme="dark"] .nav-links a.nav-tab-new:hover,
+    [data-theme="dark"] .nav-links a.nav-tab-new.active-nav {
+      color: #042f2e;
+    }
+    .nav-links a.nav-tab-new.active-nav .notif-pill {
+      background: rgba(255, 255, 255, 0.22);
+      color: #ffffff;
+      box-shadow: none;
+    }
+    [data-theme="dark"] .nav-links a.nav-tab-new.active-nav .notif-pill {
+      background: rgba(4, 47, 46, 0.22);
+      color: #042f2e;
+    }
+
+    /* Primary Page View Tabs */
+    .view-tabs-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: -8px 0 28px;
+      padding: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+    .view-tabs {
+      display: inline-flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .view-tab {
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-muted);
+      font-family: var(--sans);
+      font-size: 0.9rem;
+      font-weight: 700;
+      padding: 10px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.16s ease;
+    }
+    .view-tab:hover {
+      background: var(--surface-alt);
+      color: var(--text);
+    }
+    .view-tab.active {
+      background: var(--primary);
+      color: #ffffff;
+      box-shadow: 0 3px 10px rgba(15, 118, 110, 0.22);
+    }
+    [data-theme="dark"] .view-tab.active { color: #042f2e; }
+    .view-tab.active .notif-pill {
+      background: rgba(255, 255, 255, 0.22);
+      color: #ffffff;
+      box-shadow: none;
+    }
+    [data-theme="dark"] .view-tab.active .notif-pill {
+      background: rgba(4, 47, 46, 0.22);
+      color: #042f2e;
+    }
+    .view-tab-meta {
+      font-size: 0.8rem;
+      color: var(--text-soft);
+      padding-right: 8px;
+    }
+
+    /* Road to 10/10 Dashboard Styles */
+    .upgrade-hero {
+      background: linear-gradient(135deg, var(--emerald-bg) 0%, var(--indigo-bg) 100%);
+      border: 1px solid var(--primary-border);
+      border-radius: var(--radius);
+      padding: 24px 26px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+    .upgrade-hero h2 {
+      margin: 0 0 6px;
+      font-size: 1.45rem;
+      letter-spacing: -0.02em;
+    }
+    .upgrade-hero p {
+      margin: 0;
+      max-width: 720px;
+      font-size: 0.93rem;
+      color: var(--text-muted);
+    }
+    .overall-meter {
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 14px;
+      padding: 14px 20px;
+      min-width: 210px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+    }
+    .overall-meter-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-soft);
+    }
+    .overall-meter-val {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.04em;
+      color: var(--emerald);
+      line-height: 1.15;
+      margin: 4px 0;
+    }
+    .overall-meter-val span {
+      font-size: 1rem;
+      color: var(--text-soft);
+      font-weight: 600;
+    }
+    .overall-meter-sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+    .sim-controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .dual-bar {
+      position: relative;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--surface-alt);
+      overflow: hidden;
+    }
+    .dual-bar-target {
+      position: absolute;
+      inset: 0 auto 0 0;
+      border-radius: 999px;
+      opacity: 0.24;
+      transition: width 0.25s ease;
+    }
+    .dual-bar-live {
+      position: absolute;
+      inset: 0 auto 0 0;
+      border-radius: 999px;
+      transition: width 0.25s ease;
+    }
+    .score-delta-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.78rem;
+      color: var(--text-soft);
+      font-weight: 600;
+    }
+    .delta-chip {
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: var(--emerald-bg);
+      color: var(--emerald);
+      border: 1px solid var(--emerald-border);
+    }
+    .blueprint-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 18px;
+    }
+    .blueprint-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .blueprint-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .blueprint-head h3 {
+      margin: 0 0 3px;
+      font-size: 1.05rem;
+    }
+    .blueprint-sub {
+      font-size: 0.82rem;
+      color: var(--text-soft);
+    }
+    .upgrade-step-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .upgrade-step-list li {
+      background: var(--surface-alt);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 13px;
+      font-size: 0.87rem;
+      color: var(--text-muted);
+    }
+    .upgrade-step-list li strong {
+      color: var(--text);
+      display: block;
+      margin-bottom: 2px;
+    }
+    .pts-tag {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 1px 7px;
+      border-radius: 999px;
+      margin-left: 6px;
+      background: var(--primary-bg);
+      color: var(--primary);
+      border: 1px solid var(--primary-border);
+      vertical-align: middle;
+    }
+    .proof-line {
+      margin-top: auto;
+      font-size: 0.82rem;
+      padding: 9px 12px;
+      border-radius: 8px;
+      background: var(--primary-bg);
+      border: 1px solid var(--primary-border);
+      color: var(--text);
+    }
+    .proof-line strong { color: var(--primary); }
+
     /* Print Styling */
     @media print {
-      .topbar, .filter-row, .diagram-toolbar, .inspector { display: none !important; }
+      .topbar, .filter-row, .diagram-toolbar, .inspector, .view-tabs-bar, .sim-controls { display: none !important; }
       body { background: #ffffff; color: #0f172a; }
       .container { padding: 0; max-width: 100%; }
-      .hero, .card, .score-card, .diagram-card, .pc-column, .finding-card, .table-wrap, .check-item {
+      .hero, .card, .score-card, .diagram-card, .pc-column, .finding-card, .table-wrap, .check-item, .blueprint-card, .upgrade-hero {
         box-shadow: none !important;
         break-inside: avoid;
       }
@@ -714,6 +1016,8 @@
       .topbar-inner { padding: 10px 16px; }
       .container { padding: 24px 16px 60px; }
       .nav-links { display: none; }
+      .view-tab { flex: 1 1 auto; justify-content: center; font-size: 0.84rem; padding: 9px 12px; }
+      .view-tab-meta { display: none; }
     }
   </style>
 </head>
@@ -725,13 +1029,14 @@
         <span>Dialect · Project Review</span>
       </a>
       <nav class="nav-links" aria-label="Section navigation">
-        <a href="#verdict">Verdict</a>
-        <a href="#novelty">Novelty</a>
-        <a href="#diagrams">Diagrams</a>
-        <a href="#effectiveness">Effectiveness</a>
-        <a href="#pros-cons">Pros &amp; Cons</a>
-        <a href="#judging">Judging</a>
-        <a href="#actions">Gate G1 Plan</a>
+        <a href="#verdict" data-audit-anchor="verdict">Verdict</a>
+        <a href="#novelty" data-audit-anchor="novelty">Novelty</a>
+        <a href="#diagrams" data-audit-anchor="diagrams">Diagrams</a>
+        <a href="#effectiveness" data-audit-anchor="effectiveness">Effectiveness</a>
+        <a href="#pros-cons" data-audit-anchor="pros-cons">Pros &amp; Cons</a>
+        <a href="#judging" data-audit-anchor="judging">Judging</a>
+        <a href="#actions" data-audit-anchor="actions">Gate G1 Plan</a>
+        <a href="#road-to-10" class="nav-tab-new" id="nav-road-to-10" data-view-trigger="upgrade">Road to 10/10 <span class="notif-pill"><span class="notif-dot"></span>NEW</span></a>
       </nav>
       <div class="nav-actions">
         <button class="btn" id="themeBtn" type="button" title="Toggle light/dark mode">Dark Mode</button>
@@ -755,6 +1060,21 @@
       </p>
     </section>
 
+    <!-- Primary Page Tabs -->
+    <div class="view-tabs-bar" role="tablist" aria-label="Review sections">
+      <div class="view-tabs">
+        <button class="view-tab active" id="tab-btn-audit" type="button" role="tab" aria-selected="true" aria-controls="view-audit" data-view-trigger="audit">
+          Pre-Build Critical Audit
+        </button>
+        <button class="view-tab" id="tab-btn-upgrade" type="button" role="tab" aria-selected="false" aria-controls="view-upgrade" data-view-trigger="upgrade">
+          Road to 10/10 Blueprint
+          <span class="notif-pill"><span class="notif-dot"></span>NEW</span>
+        </button>
+      </div>
+      <span class="view-tab-meta">Switch tabs to inspect the concrete 6.8 → 10/10 upgrade plan</span>
+    </div>
+
+    <div id="view-audit" class="view-panel" role="tabpanel" aria-labelledby="tab-btn-audit">
     <!-- Verdict -->
     <section id="verdict">
       <div class="sec-head">
@@ -1459,6 +1779,519 @@
         </label>
       </div>
     </section>
+    </div><!-- /#view-audit -->
+
+    <!-- NEW TAB: Road to 10/10 Blueprint -->
+    <div id="view-upgrade" class="view-panel hidden" role="tabpanel" aria-labelledby="tab-btn-upgrade">
+      <!-- Upgrade Hero & Live Score Simulator -->
+      <section id="road-to-10" style="margin-top: 0;">
+        <div class="upgrade-hero">
+          <div>
+            <div class="eyebrow-row" style="margin-bottom: 10px;">
+              <span class="notif-pill"><span class="notif-dot"></span>NEW UPGRADE BLUEPRINT</span>
+              <span class="pill pill-teal">6.8 / 10 Baseline → 10.0 / 10 Target</span>
+              <span class="pill pill-indigo">12 Concrete Deliverables</span>
+            </div>
+            <h2>How to Elevate Dialect to a 10/10 Assessment</h2>
+            <p>
+              Every deduction in the Pre-Build Critical Audit has a specific, verifiable engineering fix. Check off deliverables in the simulator below—or toggle <strong>Preview 10/10 Target</strong>—to see exactly how each change lifts all four audit scores without exceeding the 84-hour solo budget.
+            </p>
+          </div>
+          <div class="overall-meter">
+            <div class="overall-meter-label">Projected Assessment</div>
+            <div class="overall-meter-val" id="sim-overall">6.8<span>/10</span></div>
+            <div class="overall-meter-sub" id="sim-overall-sub">Baseline · 0 / 12 upgrades applied</div>
+            <div class="sim-controls" style="justify-content: center; margin-top: 10px;">
+              <button class="btn btn-primary" id="btn-sim-all" type="button">Preview 10/10</button>
+              <button class="btn" id="btn-sim-reset" type="button">Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 Live Score Cards (Current -> 10/10) -->
+        <div class="score-grid">
+          <article class="score-card">
+            <div class="score-top">
+              <span class="score-title">Novelty &amp; Originality</span>
+              <span class="score-num" style="color: var(--primary);" id="sim-score-novelty">7.5<span>/10</span></span>
+            </div>
+            <div class="dual-bar">
+              <div class="dual-bar-target" style="width: 100%; background: var(--primary);"></div>
+              <div class="dual-bar-live" id="sim-bar-novelty" style="width: 75%; background: var(--primary);"></div>
+            </div>
+            <div class="score-delta-row">
+              <span>Baseline: 7.5</span>
+              <span class="delta-chip" id="sim-delta-novelty">+2.5 available → 10.0</span>
+            </div>
+            <p class="score-desc">
+              Move from 5-knob tuning to <strong>error-trace symbolic rule evolution</strong>, live <strong>0-byte privacy receipts</strong>, and an embeddable community conformance badge.
+            </p>
+          </article>
+
+          <article class="score-card">
+            <div class="score-top">
+              <span class="score-title">Technical Effectiveness</span>
+              <span class="score-num" style="color: var(--indigo);" id="sim-score-tech">6.5<span>/10</span></span>
+            </div>
+            <div class="dual-bar">
+              <div class="dual-bar-target" style="width: 100%; background: var(--indigo);"></div>
+              <div class="dual-bar-live" id="sim-bar-tech" style="width: 65%; background: var(--indigo);"></div>
+            </div>
+            <div class="score-delta-row">
+              <span>Baseline: 6.5</span>
+              <span class="delta-chip" id="sim-delta-tech">+3.5 available → 10.0</span>
+            </div>
+            <p class="score-desc">
+              Prove <strong>unseen-code generalization</strong> separately from caching, turn MIMIC missing units into an <strong>S2a/S2b proof</strong>, beat an abstain-prompted single LLM, and strip PHI client-side.
+            </p>
+          </article>
+
+          <article class="score-card">
+            <div class="score-top">
+              <span class="score-title">Real-World Usefulness</span>
+              <span class="score-num" style="color: var(--emerald);" id="sim-score-usefulness">7.0<span>/10</span></span>
+            </div>
+            <div class="dual-bar">
+              <div class="dual-bar-target" style="width: 100%; background: var(--emerald);"></div>
+              <div class="dual-bar-live" id="sim-bar-usefulness" style="width: 70%; background: var(--emerald);"></div>
+            </div>
+            <div class="score-delta-row">
+              <span>Baseline: 7.0</span>
+              <span class="delta-chip" id="sim-delta-usefulness">+3.0 available → 10.0</span>
+            </div>
+            <p class="score-desc">
+              Ship a <strong>1-click FHIR R4 ConceptMap / CSV export</strong>, add a <strong>zero-egress localhost LLM preset</strong>, launch Validator v1 early, and publish a practitioner quote + 3-user timing study.
+            </p>
+          </article>
+
+          <article class="score-card">
+            <div class="score-top">
+              <span class="score-title">Scope &amp; Timeline Realism</span>
+              <span class="score-num" style="color: var(--amber);" id="sim-score-scope">6.0<span>/10</span></span>
+            </div>
+            <div class="dual-bar">
+              <div class="dual-bar-target" style="width: 100%; background: var(--amber);"></div>
+              <div class="dual-bar-live" id="sim-bar-scope" style="width: 60%; background: var(--amber);"></div>
+            </div>
+            <div class="score-delta-row">
+              <span>Baseline: 6.0</span>
+              <span class="delta-chip" id="sim-delta-scope">+4.0 available → 10.0</span>
+            </div>
+            <p class="score-desc">
+              Cut <strong>~55 hrs</strong> of low-ROI stretch scope at Gate G1, run a <strong>Week-2 cross-origin nsDeploy smoke test</strong>, front-load before holidays, and add a CI <code>verify:docs</code> guard.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <!-- Dimension-by-Dimension Playbook -->
+      <section id="upgrade-pillars">
+        <div class="sec-head">
+          <div>
+            <h2>1. Dimension-by-Dimension Path to 10/10</h2>
+            <p>Concrete architectural, scientific, UX, and execution upgrades mapped directly to the audit findings.</p>
+          </div>
+        </div>
+
+        <div class="blueprint-grid">
+          <!-- Pillar 1: Novelty -->
+          <article class="blueprint-card" style="border-top: 4px solid var(--primary);">
+            <div class="blueprint-head">
+              <div>
+                <h3>Novelty &amp; Originality</h3>
+                <div class="blueprint-sub">From strong synthesis (7.5) → category-defining primitive (10.0)</div>
+              </div>
+              <span class="status-chip chip-teal">7.5 → 10.0</span>
+            </div>
+            <ul class="upgrade-step-list">
+              <li>
+                <strong>Error-Trace Symbolic Rule Evolution + Diffs <span class="pts-tag">+1.0</span></strong>
+                Evolve concrete Neuro SAN disambiguation rules directly from <code>-5</code> error traces (e.g., specimen conflict, calculated-vs-measured, missing-unit escalation) and publish readable <em>Gen 0 → Gen N</em> JSON diffs showing which clinical failure each generation eliminated.
+              </li>
+              <li>
+                <strong>Live Egress &amp; 0-Byte Privacy Receipt <span class="pts-tag">+0.9</span></strong>
+                Instrument outbound <code>fetch()</code> + <code>PerformanceResourceTiming</code> inside Hospital B to show a live ledger of contacted origins, payload hashes, and a verifiable <code>0 bytes</code> private-context/key receipt for Origin A.
+              </li>
+              <li>
+                <strong>Protocol Primitive + Embeddable Validator Badge <span class="pts-tag">+0.6</span></strong>
+                Publish an open <code>DialectProfile</code> v1 JSON schema (with LOINC HL7 as #1), optional NANDA discovery metadata, and an embeddable SVG badge (<code>OAW Spec 7/7 Pass</code>) other entrants paste into their READMEs.
+              </li>
+            </ul>
+            <div class="proof-line">
+              <strong>Judge Proof:</strong> Side-by-side Gen-0 vs. Gen-N rule diff + live privacy ledger screenshot + community validator badge adoption.
+            </div>
+          </article>
+
+          <!-- Pillar 2: Technical Effectiveness -->
+          <article class="blueprint-card" style="border-top: 4px solid var(--indigo);">
+            <div class="blueprint-head">
+              <div>
+                <h3>Technical Effectiveness</h3>
+                <div class="blueprint-sub">From risky G2 traps (6.5) → airtight empirical benchmark (10.0)</div>
+              </div>
+              <span class="status-chip chip-teal">6.5 → 10.0</span>
+            </div>
+            <ul class="upgrade-step-list">
+              <li>
+                <strong>Two-Curve Disentangled Transfer Benchmark <span class="pts-tag">+1.2</span></strong>
+                Report (a) <em>Repeat-Code Cache</em> (0 tokens, exact hits) and (b) <em>Strictly Disjoint Unseen-Code Generalization</em> separately in <code>results.json</code>. Enforce the G2 recovery rule on unseen codes so the "it's just a hash map" critique is dead on arrival.
+              </li>
+              <li>
+                <strong>MIMIC-IV S2a vs. S2b Missing-Unit Proof <span class="pts-tag">+1.0</span></strong>
+                Tag all 269 MIMIC rows as unit-dependent vs. unit-invariant. Show <strong>S2a</strong> (no site unit mode → honest abstention saves <code>-5</code> penalties) vs. <strong>S2b</strong> (site sets US conventional units in <code>sly_data</code> → coverage jumps). Keep MIMIC strictly held-out (ODbL/MIT clean).
+              </li>
+              <li>
+                <strong>4-Way Fair Matrix + PHI Stripper + Locked Proxy <span class="pts-tag">+1.3</span></strong>
+                Benchmark against (1) lexical match, (2) forced-choice LLM, and (3) <strong>abstain-prompted single LLM</strong> with 95% CIs. Enforce deterministic client-side <code>PID/PV1/NK1</code> stripping and schema-lock the no-key Vercel proxy with IP caps + labeled replay fallback.
+              </li>
+            </ul>
+            <div class="proof-line">
+              <strong>Judge Proof:</strong> <code>results.json</code> with 4 baselines + Risk-Coverage Pareto chart + 0-PHI egress payload preview in UI.
+            </div>
+          </article>
+
+          <!-- Pillar 3: Real-World Usefulness -->
+          <article class="blueprint-card" style="border-top: 4px solid var(--emerald);">
+            <div class="blueprint-head">
+              <div>
+                <h3>Real-World Usefulness</h3>
+                <div class="blueprint-sub">From browser demo (7.0) → deployable hospital IT workbench (10.0)</div>
+              </div>
+              <span class="status-chip chip-green">7.0 → 10.0</span>
+            </div>
+            <ul class="upgrade-step-list">
+              <li>
+                <strong>1-Click FHIR R4 ConceptMap / CSV / Mirth Export <span class="pts-tag">+1.1</span></strong>
+                Reframe Dialect as a pre-production onboarding &amp; LIS-drift audit workbench. End Ana's queue with instant exports: valid FHIR R4 <code>ConceptMap</code> JSON, RELMA/Cloverleaf CSV, and an S3 drift-diff audit report.
+              </li>
+              <li>
+                <strong>1-Click Zero-Egress On-Prem LLM Preset <span class="pts-tag">+0.9</span></strong>
+                Add an OpenAI-compatible <code>Local / On-Prem LLM (Ollama / vLLM · localhost:11434/v1)</code> preset in BYOK settings—proving hospitals can run Dialect with zero external cloud egress when deploying beyond the demo.
+              </li>
+              <li>
+                <strong>Early Community Launch + Human Evidence <span class="pts-tag">+1.0</span></strong>
+                Post Conformance Validator v1 in Cognizant Discussions by mid-Dec, capture a quoted 2-sentence review from a real hospital IT / lab informatics analyst, and publish timed results from 3 unassisted first-time users (&lt;3 min).
+              </li>
+            </ul>
+            <div class="proof-line">
+              <strong>Judge Proof:</strong> Downloadable valid FHIR <code>ConceptMap</code> file + named/role practitioner quote + 3-user timing table.
+            </div>
+          </article>
+
+          <!-- Pillar 4: Scope & Timeline Realism -->
+          <article class="blueprint-card" style="border-top: 4px solid var(--amber);">
+            <div class="blueprint-head">
+              <div>
+                <h3>Scope &amp; Timeline Realism</h3>
+                <div class="blueprint-sub">From 145-hr crunch risk (6.0) → 80-hr holiday-proof plan (10.0)</div>
+              </div>
+              <span class="status-chip chip-amber">6.0 → 10.0</span>
+            </div>
+            <ul class="upgrade-step-list">
+              <li>
+                <strong>Hard Gate G1 Scope Lock (Save ~55 Hours) <span class="pts-tag">+1.5</span></strong>
+                Officially cut Hospital C (remove <code>sites/hospital-c</code> drift), Scenario S4 (eICU), non-healthcare profiles, and standalone Validator v2 harness (replaced by Hospital B's built-in Live Egress Receipt panel at 1/4 the effort).
+              </li>
+              <li>
+                <strong>Week-2 Cross-Origin nsDeploy Smoke Test <span class="pts-tag">+1.3</span></strong>
+                Pull a minimal 2-origin Vercel peer-load test into P2 (by 6 Dec) instead of waiting until P3 (20 Dec). Eliminates CORS / <code>bridge/</code> / runtime surprises while 5 weeks remain.
+              </li>
+              <li>
+                <strong>Front-Loaded 80-Hr Budget + CI <code>verify:docs</code> <span class="pts-tag">+1.2</span></strong>
+                Finish core coding by 20 Dec so Christmas/New Year is strictly cached eval runs, charts, and user testing. Add a 40-line CI script checking JSON schemas, <code>facts.md</code> parity, and zero privacy/scope contradictions.
+              </li>
+            </ul>
+            <div class="proof-line">
+              <strong>Judge Proof:</strong> Green CI badge validating manifests + <code>facts.md</code> parity + feature freeze hit on 3 Jan with 7 days for video/polish.
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- Upgraded 10/10 Target Architecture SVG -->
+      <section id="upgrade-diagram">
+        <div class="sec-head">
+          <div>
+            <h2>2. Upgraded 10/10 Evidence &amp; Runtime Pipeline</h2>
+            <p>Click any upgraded module to inspect what changes from the original plan and which judging criterion it locks down.</p>
+          </div>
+        </div>
+
+        <div class="diagram-card">
+          <div class="diagram-toolbar">
+            <span class="pill pill-teal">10/10 Target Architecture · Click any box to inspect</span>
+            <span class="diagram-hint">Green borders = new 10/10 additions</span>
+          </div>
+          <div class="svg-wrap">
+            <svg viewBox="0 0 1060 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Upgraded 10/10 Dialect Evidence and Runtime Pipeline">
+              <defs>
+                <marker id="u-teal" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="#0f766e"/>
+                </marker>
+                <marker id="u-indigo" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="#4f46e5"/>
+                </marker>
+                <marker id="u-emerald" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
+                  <path d="M 0 1 L 10 5 L 0 9 z" fill="#059669"/>
+                </marker>
+              </defs>
+
+              <!-- Top Row: Offline Evidence & Evolution -->
+              <rect x="16" y="16" width="1028" height="148" rx="14" fill="#eef2ff" stroke="#a5b4fc" stroke-width="1.5"/>
+              <text x="34" y="40" font-size="11.5" font-weight="700" fill="#4338ca">OFFLINE SCIENTIFIC PROOF &amp; CI VERIFICATION LAYER (LOCKS TECHNICAL EFFECTIVENESS &amp; NOVELTY AT 10/10)</text>
+
+              <g class="svg-node upgrade-node" data-title="Error-Trace Symbolic Evolution" data-badge="Novelty +1.0" data-desc="Mutates explicit disambiguation rules (specimen, unit, calculated-vs-measured) from -5 error traces and publishes human-readable Gen 0 → Gen N JSON diffs on Hospital A.">
+                <rect x="34" y="56" width="218" height="88" rx="10" fill="#ffffff" stroke="#059669" stroke-width="2"/>
+                <text x="143" y="84" text-anchor="middle" font-size="12" font-weight="700" fill="#065f46">Error-Trace Rule Evolution</text>
+                <text x="143" y="103" text-anchor="middle" font-size="10.5" fill="#475569">Mutates rules from -5 traces</text>
+                <text x="143" y="122" text-anchor="middle" font-size="10" font-weight="700" fill="#059669">Publishes Gen 0→N Diffs</text>
+              </g>
+
+              <g class="svg-node upgrade-node" data-title="4-Way Fair Baseline Matrix" data-badge="Tech +1.3" data-desc="Evaluates Lexical, Forced-Choice LLM, Abstain-Prompted Single LLM, and Dialect Evolved Network on ≥200 held-out items with bootstrap 95% CIs and Risk-Coverage curves.">
+                <rect x="284" y="56" width="224" height="88" rx="10" fill="#ffffff" stroke="#4f46e5" stroke-width="2"/>
+                <text x="396" y="84" text-anchor="middle" font-size="12" font-weight="700" fill="#312e81">4-Way Fair Baseline Matrix</text>
+                <text x="396" y="103" text-anchor="middle" font-size="10.5" fill="#475569">Includes Abstain-Prompted LLM</text>
+                <text x="396" y="122" text-anchor="middle" font-size="10" font-weight="700" fill="#4338ca">95% CI + Cost Pareto</text>
+              </g>
+
+              <g class="svg-node upgrade-node" data-title="Disentangled S1 + MIMIC S2a/S2b" data-badge="Tech +2.2" data-desc="Reports S1 Repeat-Code Cache separately from Unseen-Code Generalization, and runs MIMIC 269 rows both without (S2a) and with (S2b) site unit convention in sly_data.">
+                <rect x="540" y="56" width="234" height="88" rx="10" fill="#ffffff" stroke="#059669" stroke-width="2"/>
+                <text x="657" y="84" text-anchor="middle" font-size="12" font-weight="700" fill="#065f46">S1 Unseen + S2a/S2b MIMIC</text>
+                <text x="657" y="103" text-anchor="middle" font-size="10.5" fill="#475569">Separates cache vs. adaptation</text>
+                <text x="657" y="122" text-anchor="middle" font-size="10" font-weight="700" fill="#059669">ODbL Held-Out Isolation</text>
+              </g>
+
+              <g class="svg-node upgrade-node" data-title="Automated CI Consistency Guard (verify:docs)" data-badge="Scope +1.2" data-desc="Runs on every push: validates manifest/Neuro SAN/links JSON schemas, ensures docs/facts.md matches results.json, and blocks doc drift or forbidden privacy claims before AI screeners ever see them.">
+                <rect x="806" y="56" width="220" height="88" rx="10" fill="#ffffff" stroke="#0f766e" stroke-width="2"/>
+                <text x="916" y="84" text-anchor="middle" font-size="12" font-weight="700" fill="#0f766e">CI verify:docs Guard</text>
+                <text x="916" y="103" text-anchor="middle" font-size="10.5" fill="#475569">Schemas + facts.md parity</text>
+                <text x="916" y="122" text-anchor="middle" font-size="10" font-weight="700" fill="#0f766e">Zero AI-Screener Drift</text>
+              </g>
+
+              <!-- Bottom Row: Browser Workbench & Community Proof -->
+              <rect x="16" y="186" width="1028" height="156" rx="14" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.5"/>
+              <text x="34" y="210" font-size="11.5" font-weight="700" fill="#047857">BROWSER WORKBENCH &amp; COMMUNITY ECOSYSTEM LAYER (LOCKS USEFULNESS, DESIGN &amp; IMPACT AT 10/10)</text>
+
+              <g class="svg-node upgrade-node" data-title="Deterministic Client-Side PHI Stripper" data-badge="Privacy Fix" data-desc="Drops PID, PV1, NK1, NTE, patient IDs, and timestamps in plain TypeScript before any inference call. Shows exact stripped JSON payload to the analyst for full transparency.">
+                <rect x="34" y="226" width="218" height="96" rx="10" fill="#ffffff" stroke="#059669" stroke-width="2"/>
+                <text x="143" y="254" text-anchor="middle" font-size="12" font-weight="700" fill="#065f46">Client PHI Stripper</text>
+                <text x="143" y="273" text-anchor="middle" font-size="10.5" fill="#475569">Drops PID/PV1/NK1 pre-LLM</text>
+                <text x="143" y="294" text-anchor="middle" font-size="10" font-weight="700" fill="#059669">Visible Payload Preview</text>
+              </g>
+
+              <g class="svg-node upgrade-node" data-title="3-Tier Inference Router (No-Key / BYOK / Localhost)" data-badge="Usefulness +0.9" data-desc="Schema-locked same-origin default proxy (with cap + labeled replay fallback), BYOK cloud router, PLUS 1-click Local/On-Prem LLM preset (localhost:11434/v1) for true zero-egress deployments.">
+                <rect x="284" y="226" width="224" height="96" rx="10" fill="#ffffff" stroke="#0f766e" stroke-width="2"/>
+                <text x="396" y="254" text-anchor="middle" font-size="12" font-weight="700" fill="#0f766e">3-Tier Inference Router</text>
+                <text x="396" y="273" text-anchor="middle" font-size="10.5" fill="#475569">Locked Proxy · BYOK · Localhost</text>
+                <text x="396" y="294" text-anchor="middle" font-size="10" font-weight="700" fill="#0f766e">Zero-Egress On-Prem Path</text>
+              </g>
+
+              <g class="svg-node upgrade-node" data-title="Live Egress &amp; 0-Byte Privacy Receipt" data-badge="Novelty +0.9" data-desc="Monitors every browser network request in real time, proving Origin A received 0 bytes of Hospital B's alias table, codes, or BYOK key. Exportable as signed verification JSON.">
+                <rect x="540" y="226" width="234" height="96" rx="10" fill="#ffffff" stroke="#059669" stroke-width="2"/>
+                <text x="657" y="254" text-anchor="middle" font-size="12" font-weight="700" fill="#065f46">Live Egress Privacy Receipt</text>
+                <text x="657" y="273" text-anchor="middle" font-size="10.5" fill="#475569">Origin ledger · 0 bytes to Peer A</text>
+                <text x="657" y="294" text-anchor="middle" font-size="10" font-weight="700" fill="#059669">Replaces heavy Validator v2</text>
+              </g>
+
+              <g class="svg-node upgrade-node" data-title="FHIR ConceptMap Export + Community Validator Badge" data-badge="Usefulness +1.1" data-desc="1-click FHIR R4 ConceptMap JSON, CSV for Mirth/Rhapsody/Cloverleaf, plus early-launched Conformance Validator v1 with embeddable 7/7 Spec Pass SVG badges for all hackathon teams.">
+                <rect x="806" y="226" width="220" height="96" rx="10" fill="#ffffff" stroke="#4f46e5" stroke-width="2"/>
+                <text x="916" y="254" text-anchor="middle" font-size="12" font-weight="700" fill="#312e81">ConceptMap + OAW Badge</text>
+                <text x="916" y="273" text-anchor="middle" font-size="10.5" fill="#475569">FHIR R4 / CSV + Validator v1</text>
+                <text x="916" y="294" text-anchor="middle" font-size="10" font-weight="700" fill="#4338ca">Real IT &amp; Community Output</text>
+              </g>
+
+              <!-- Arrows -->
+              <path d="M 252 100 L 282 100" stroke="#4f46e5" stroke-width="1.8" fill="none" marker-end="url(#u-indigo)"/>
+              <path d="M 508 100 L 538 100" stroke="#4f46e5" stroke-width="1.8" fill="none" marker-end="url(#u-indigo)"/>
+              <path d="M 774 100 L 804 100" stroke="#0f766e" stroke-width="1.8" fill="none" marker-end="url(#u-teal)"/>
+
+              <path d="M 252 274 L 282 274" stroke="#059669" stroke-width="1.8" fill="none" marker-end="url(#u-emerald)"/>
+              <path d="M 508 274 L 538 274" stroke="#059669" stroke-width="1.8" fill="none" marker-end="url(#u-emerald)"/>
+              <path d="M 774 274 L 804 274" stroke="#4f46e5" stroke-width="1.8" fill="none" marker-end="url(#u-indigo)"/>
+            </svg>
+          </div>
+          <div class="inspector">
+            <span class="inspector-badge" id="ins-upgrade-badge">10/10 Upgrade</span>
+            <div class="inspector-text" id="ins-upgrade-text">
+              <strong>Click any node above</strong> to inspect how that specific upgrade eliminates an audit deduction and what concrete proof judges will see.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scope Re-Budget Table -->
+      <section id="scope-rebudget">
+        <div class="sec-head">
+          <div>
+            <h2>3. Holiday-Proof Scope Re-Budget (145 hrs → 80 hrs)</h2>
+            <p>How cutting low-ROI stretch work pays for every 10/10 upgrade while preserving a 12-hour emergency buffer.</p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 24%;">Workstream</th>
+                <th style="width: 14%;">Original Est.</th>
+                <th style="width: 14%;">10/10 Plan</th>
+                <th style="width: 16%;">Decision</th>
+                <th style="width: 32%;">Why This Raises the Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Hospital C + 3rd Origin</strong></td>
+                <td>~14 hrs</td>
+                <td><strong>0 hrs</strong></td>
+                <td><span class="status-chip chip-amber">Cut &amp; Delete Dir</span></td>
+                <td>Two distinct origins (A↔B) prove 100% of cross-origin consent &amp; transfer; deleting <code>sites/hospital-c</code> also eliminates doc drift.</td>
+              </tr>
+              <tr>
+                <td><strong>Scenario S4 (eICU Intake)</strong></td>
+                <td>~16 hrs</td>
+                <td><strong>0 hrs</strong></td>
+                <td><span class="status-chip chip-amber">Cut to Stretch</span></td>
+                <td>Unlabelled eICU adds license/extraction work without new ground-truth scores; S1 + S2a/S2b + S3 cover every judge question.</td>
+              </tr>
+              <tr>
+                <td><strong>Validator v2 Browser Harness</strong></td>
+                <td>~18 hrs</td>
+                <td><strong>4 hrs</strong></td>
+                <td><span class="status-chip chip-teal">Replace w/ Receipt</span></td>
+                <td>Replace fragile cross-origin Playwright/DOM harness with Hospital B's built-in <strong>Live Egress &amp; 0-Byte Privacy Receipt</strong> panel.</td>
+              </tr>
+              <tr>
+                <td><strong>10/10 High-ROI Additions</strong><br/><span style="font-size: 0.8rem; color: var(--text-soft);">PHI Stripper, ConceptMap Export, Rule Diffs, S2a/S2b, CI guard</span></td>
+                <td>0 hrs</td>
+                <td><strong>+11 hrs</strong></td>
+                <td><span class="status-chip chip-green">Add to Core</span></td>
+                <td>Directly resolves all 4 Critical Audit findings in ~11 focused hours—funded 4× over by cutting ~48 hrs of stretch bloat.</td>
+              </tr>
+              <tr>
+                <td><strong>Early P2 Cross-Origin Smoke Test</strong></td>
+                <td>Deferred to P3</td>
+                <td><strong>2 hrs (in P2)</strong></td>
+                <td><span class="status-chip chip-green">Pull Forward</span></td>
+                <td>De-risks <code>nsDeploy</code> cross-origin peer loading 2 weeks early so Christmas/New Year stays stress-free.</td>
+              </tr>
+              <tr>
+                <td><strong>Total Solo Budget (Nov 24 – Jan 10)</strong></td>
+                <td><strong>~145 hrs</strong></td>
+                <td><strong>72 hrs + 12 hr buffer</strong></td>
+                <td><span class="status-chip chip-green">10/10 Realistic</span></td>
+                <td>Fits comfortably inside 84 budgeted hours with feature freeze on 3 Jan and full video polish week.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Interactive 12-Item 10/10 Deliverables Checklist -->
+      <section id="upgrade-checklist">
+        <div class="sec-head">
+          <div>
+            <h2>4. Interactive 10/10 Upgrade Checklist (Live Score Simulator)</h2>
+            <p>Check each upgrade as you commit it to watch all four assessment scores climb to 10.0/10.</p>
+          </div>
+          <span class="progress-note" id="upgrade-progress">0 / 12 completed</span>
+        </div>
+
+        <div class="checklist" id="upgrade-list">
+          <!-- Novelty -->
+          <label class="check-item upgrade-item" data-id="u-nov-1" data-dim="novelty" data-pts="1.0">
+            <input type="checkbox" />
+            <div>
+              <div class="check-title">[Novelty +1.0] Evolve symbolic disambiguation rules from <code>-5</code> traces &amp; publish Gen 0→N JSON diffs</div>
+              <div class="check-desc">Store interpretable rule mutations in Neuro SAN JSON and render a visual diff card showing exact clinical errors eliminated per generation.</div>
+            </div>
+          </label>
+          <label class="check-item upgrade-item" data-id="u-nov-2" data-dim="novelty" data-pts="0.9">
+            <input type="checkbox" />
+            <div>
+              <div class="check-title">[Novelty +0.9] Build the Live Egress &amp; 0-Byte Privacy Receipt Inspector inside Hospital B</div>
+              <div class="check-desc">Log every outbound origin + payload hash via browser instrumentation and export a verifiable JSON receipt proving 0 private bytes reached Origin A.</div>
+            </div>
+          </label>
+          <label class="check-item upgrade-item" data-id="u-nov-3" data-dim="novelty" data-pts="0.6">
+            <input type="checkbox" />
+            <div>
+              <div class="check-title">[Novelty +0.6] Publish open <code>DialectProfile</code> v1 schema, NANDA descriptor &amp; Embeddable Validator Badge</div>
+              <div class="check-desc">Generate an SVG <code>OAW Spec 7/7 Pass</code> badge in Validator v1 so other entrants adopt and link back to Dialect.</div>
+            </div>
+          </label>
+
+          <!-- Technical Effectiveness -->
+          <label class="check-item upgrade-item" data-id="u-tech-1" data-dim="tech" data-pts="1.2">
+            <input type="checkbox" />
+            <div>
+              <div class="check-title">[Tech +1.2] Split Transfer eval into Repeat-Code Cache vs. Strictly Unseen-Code Generalization</div>
+              <div class="check-desc">Report zero-overlap held-out unseen codes separately in <code>results.json</code> and enforce Gate G2 recovery on unseen codes.</div>
+            </div>
+          </label>
+          <label class="check-item upgrade-item" data-id="u-tech-2" data-dim="tech" data-pts="1.0">
+            <input type="checkbox" />
+            <div>
+              <div class="check-title">[Tech +1.0] Run MIMIC-IV 269 benchmark as S2a (No Unit Mode) vs. S2b (+ Site Unit Convention)</div>
+              <div class="check-desc">Tag unit-dependent MIMIC rows, prove safe abstention without site context, and show deterministic UCUM recovery once site context is set—keeping MIMIC strictly held-out (ODbL clean).</div>
+            </div>
+          </label>
+          <label class="check-item upgrade-item" data-id="u-tech-3" data-dim="tech" data-pts="1.3">
+            <input type="checkbox" />
+            <div>
+              <div class="check-title">[Tech +1.3] Benchmark 4-way matrix (incl. Abstain-Prompted LLM) + Client PHI Stripper + Schema-Locked Proxy</div>
+              <div class="check-desc">Add bootstrap 95% CIs, strip <code>PID/PV1/NK1</code> before LLM calls in plain TypeScript, and schema-lock the default proxy with IP caps + labeled replay fallback.</div>
+            </div>
+          </label>
+
+          <!-- Real-World Usefulness -->
+          <label class="check-item upgrade-item" data-id="u-use-1" data-dim="usefulness" data-pts="1.1">
+            <input type="checkbox" />
+            <div>
+              <div class="check-title">[Usefulness +1.1] Ship 1-click FHIR R4 <code>ConceptMap</code> JSON, CSV &amp; S3 Drift-Diff exports</div>
+              <div class="check-desc">Position Dialect explicitly as a zero-install mapping &amp; migration workbench feeding Mirth Connect, Rhapsody, and Cloverleaf.</div>
+            </div>
+          </label>
+          <label class="check-item upgrade-item" data-id="u-use-2" data-dim="usefulness" data-pts="0.9">
+            <input type="checkbox" />
+            <div>
+              <div class="check-title">[Usefulness +0.9] Add 1-click Local / On-Prem LLM preset (<code>localhost:11434/v1</code>) in BYOK settings</div>
+              <div class="check-desc">Demonstrates a concrete zero-external-egress deployment path for real hospital IT teams beyond the hackathon demo.</div>
+            </div>
+          </label>
+          <label class="check-item upgrade-item" data-id="u-use-3" data-dim="usefulness" data-pts="1.0">
+            <input type="checkbox" />
+            <div>
+              <div class="check-title">[Usefulness +1.0] Launch Validator v1 by mid-Dec + real hospital IT quote + 3-user timed study (&lt;3 min)</div>
+              <div class="check-desc">Post Validator v1 early in Cognizant Discussions, quote a real lab/HIMS analyst with permission, and publish unassisted user completion times.</div>
+            </div>
+          </label>
+
+          <!-- Scope & Timeline -->
+          <label class="check-item upgrade-item" data-id="u-scp-1" data-dim="scope" data-pts="1.5">
+            <input type="checkbox" />
+            <div>
+              <div class="check-title">[Scope +1.5] Lock Gate G1 scope: delete <code>sites/hospital-c</code> &amp; demote S4 / Validator v2 harness</div>
+              <div class="check-desc">Record the cut in <code>DECISIONS.md</code> and harmonize <code>README.md</code> + <code>idea-summary.md</code> so zero doc drift remains.</div>
+            </div>
+          </label>
+          <label class="check-item upgrade-item" data-id="u-scp-2" data-dim="scope" data-pts="1.3">
+            <input type="checkbox" />
+            <div>
+              <div class="check-title">[Scope +1.3] Pass 2-origin <code>nsDeploy</code> peer-load smoke test in Week 2 (P2, by 6 Dec)</div>
+              <div class="check-desc">Deploy minimal Hospital A and B Vercel origins early to verify CORS, consent gate, and exact-name peer loading before building full UI.</div>
+            </div>
+          </label>
+          <label class="check-item upgrade-item" data-id="u-scp-3" data-dim="scope" data-pts="1.2">
+            <input type="checkbox" />
+            <div>
+              <div class="check-title">[Scope +1.2] Add CI <code>verify:docs</code> consistency guard &amp; hold 3 Jan feature freeze</div>
+              <div class="check-desc">Automate JSON schema checks, <code>docs/facts.md</code> ↔ <code>results.json</code> number parity, and privacy copy checks on every push.</div>
+            </div>
+          </label>
+        </div>
+      </section>
+    </div><!-- /#view-upgrade -->
 
     <footer>
       <div><strong>Dialect Pre-Build Review</strong> · Standalone shareable report (zero external scripts or tracking)</div>
@@ -1482,7 +2315,69 @@
       localStorage.setItem('dialect-review-theme', next);
     });
 
-    // Diagram switcher
+    // Primary Page View Tabs (Pre-Build Audit vs Road to 10/10)
+    const viewAudit = document.getElementById('view-audit');
+    const viewUpgrade = document.getElementById('view-upgrade');
+    const tabBtnAudit = document.getElementById('tab-btn-audit');
+    const tabBtnUpgrade = document.getElementById('tab-btn-upgrade');
+    const navRoadTo10 = document.getElementById('nav-road-to-10');
+
+    function setActiveView(viewName, updateHash) {
+      const isUpgrade = viewName === 'upgrade';
+      viewAudit.classList.toggle('hidden', isUpgrade);
+      viewUpgrade.classList.toggle('hidden', !isUpgrade);
+
+      tabBtnAudit.classList.toggle('active', !isUpgrade);
+      tabBtnAudit.setAttribute('aria-selected', String(!isUpgrade));
+      tabBtnUpgrade.classList.toggle('active', isUpgrade);
+      tabBtnUpgrade.setAttribute('aria-selected', String(isUpgrade));
+      if (navRoadTo10) navRoadTo10.classList.toggle('active-nav', isUpgrade);
+
+      if (updateHash) {
+        if (isUpgrade) {
+          history.replaceState(null, '', '#road-to-10');
+        } else if (window.location.hash === '#road-to-10') {
+          history.replaceState(null, '', '#verdict');
+        }
+      }
+    }
+
+    document.querySelectorAll('[data-view-trigger]').forEach(el => {
+      el.addEventListener('click', (e) => {
+        if (el.tagName === 'A') e.preventDefault();
+        const target = el.dataset.viewTrigger;
+        setActiveView(target, true);
+        if (target === 'upgrade') {
+          document.querySelector('.view-tabs-bar').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // Clicking any Audit topbar anchor automatically returns to Audit tab and scrolls
+    document.querySelectorAll('[data-audit-anchor]').forEach(link => {
+      link.addEventListener('click', (e) => {
+        if (!viewAudit.classList.contains('hidden')) return;
+        e.preventDefault();
+        const id = link.dataset.auditAnchor;
+        setActiveView('audit', false);
+        const sec = document.getElementById(id);
+        if (sec) {
+          history.replaceState(null, '', '#' + id);
+          sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+
+    // Deep-link support (?tab=10-of-10 or #road-to-10)
+    (function initViewFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      const hash = window.location.hash.toLowerCase();
+      if (params.get('tab') === '10-of-10' || params.get('tab') === 'upgrade' || hash === '#road-to-10') {
+        setActiveView('upgrade', false);
+      }
+    })();
+
+    // Diagram switcher (inside Audit tab)
     const tabBtns = document.querySelectorAll('.tab-btn');
     const diagArch = document.getElementById('diag-arch');
     const diagLoop = document.getElementById('diag-loop');
@@ -1496,16 +2391,29 @@
       });
     });
 
-    // Interactive SVG node inspector
-    const nodes = document.querySelectorAll('.svg-node');
+    // Interactive SVG node inspector (Audit diagrams)
+    const auditNodes = document.querySelectorAll('#view-audit .svg-node');
     const insBadge = document.getElementById('ins-badge');
     const insText = document.getElementById('ins-text');
-    nodes.forEach(node => {
+    auditNodes.forEach(node => {
       node.addEventListener('click', () => {
-        nodes.forEach(n => n.classList.remove('selected'));
+        auditNodes.forEach(n => n.classList.remove('selected'));
         node.classList.add('selected');
         insBadge.textContent = node.dataset.badge || 'Component';
         insText.innerHTML = '<strong>' + node.dataset.title + ':</strong> ' + node.dataset.desc;
+      });
+    });
+
+    // Interactive SVG node inspector (Road to 10/10 diagram)
+    const upgradeNodes = document.querySelectorAll('.upgrade-node');
+    const insUpBadge = document.getElementById('ins-upgrade-badge');
+    const insUpText = document.getElementById('ins-upgrade-text');
+    upgradeNodes.forEach(node => {
+      node.addEventListener('click', () => {
+        upgradeNodes.forEach(n => n.classList.remove('selected'));
+        node.classList.add('selected');
+        insUpBadge.textContent = node.dataset.badge || '10/10 Upgrade';
+        insUpText.innerHTML = '<strong>' + node.dataset.title + ':</strong> ' + node.dataset.desc;
       });
     });
 
@@ -1533,8 +2441,8 @@
       });
     });
 
-    // Persistent Gate G1 checklist
-    const checkItems = document.querySelectorAll('.check-item');
+    // Persistent Gate G1 checklist (Audit tab)
+    const checkItems = document.querySelectorAll('#checklist .check-item');
     const progressEl = document.getElementById('check-progress');
     function updateChecklistUI() {
       let done = 0;
@@ -1555,6 +2463,78 @@
       });
     });
     updateChecklistUI();
+
+    // Persistent 10/10 Upgrade Simulator Checklist
+    const baseScores = { novelty: 7.5, tech: 6.5, usefulness: 7.0, scope: 6.0 };
+    const upgradeItems = document.querySelectorAll('.upgrade-item');
+    const upgradeProgressEl = document.getElementById('upgrade-progress');
+    const simOverallEl = document.getElementById('sim-overall');
+    const simOverallSubEl = document.getElementById('sim-overall-sub');
+
+    function updateUpgradeSimulator() {
+      const scores = { ...baseScores };
+      let done = 0;
+      upgradeItems.forEach(item => {
+        const cb = item.querySelector('input');
+        item.classList.toggle('done', cb.checked);
+        if (cb.checked) {
+          done++;
+          const dim = item.dataset.dim;
+          const pts = parseFloat(item.dataset.pts || '0');
+          scores[dim] = Math.min(10, Math.round((scores[dim] + pts) * 10) / 10);
+        }
+      });
+
+      Object.keys(scores).forEach(dim => {
+        const val = scores[dim];
+        const rem = Math.max(0, Math.round((10 - val) * 10) / 10);
+        const scoreEl = document.getElementById('sim-score-' + dim);
+        const barEl = document.getElementById('sim-bar-' + dim);
+        const deltaEl = document.getElementById('sim-delta-' + dim);
+        if (scoreEl) scoreEl.innerHTML = val.toFixed(1) + '<span>/10</span>';
+        if (barEl) barEl.style.width = (val * 10) + '%';
+        if (deltaEl) {
+          deltaEl.textContent = rem === 0 ? '10.0 / 10 Achieved' : ('+' + rem.toFixed(1) + ' available → 10.0');
+        }
+      });
+
+      const avg = Math.round(((scores.novelty + scores.tech + scores.usefulness + scores.scope) / 4) * 10) / 10;
+      simOverallEl.innerHTML = avg.toFixed(1) + '<span>/10</span>';
+      simOverallSubEl.textContent = done === upgradeItems.length
+        ? '10/10 Target Ready · All 12 upgrades applied'
+        : (done === 0 ? 'Baseline · 0 / 12 upgrades applied' : 'In Progress · ' + done + ' / ' + upgradeItems.length + ' upgrades applied');
+      upgradeProgressEl.textContent = done + ' / ' + upgradeItems.length + ' completed';
+    }
+
+    upgradeItems.forEach(item => {
+      const cb = item.querySelector('input');
+      const key = 'dialect-upgrade-' + item.dataset.id;
+      if (localStorage.getItem(key) === '1') cb.checked = true;
+      cb.addEventListener('change', () => {
+        localStorage.setItem(key, cb.checked ? '1' : '0');
+        updateUpgradeSimulator();
+      });
+    });
+
+    document.getElementById('btn-sim-all').addEventListener('click', () => {
+      upgradeItems.forEach(item => {
+        const cb = item.querySelector('input');
+        cb.checked = true;
+        localStorage.setItem('dialect-upgrade-' + item.dataset.id, '1');
+      });
+      updateUpgradeSimulator();
+    });
+
+    document.getElementById('btn-sim-reset').addEventListener('click', () => {
+      upgradeItems.forEach(item => {
+        const cb = item.querySelector('input');
+        cb.checked = false;
+        localStorage.setItem('dialect-upgrade-' + item.dataset.id, '0');
+      });
+      updateUpgradeSimulator();
+    });
+
+    updateUpgradeSimulator();
   </script>
 </body>
 </html>
