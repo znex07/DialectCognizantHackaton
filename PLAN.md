@@ -1,202 +1,229 @@
 # Dialect: Project Plan
 
-Open Agentic Web Challenge (Cognizant). Rewritten Tue 24 Nov 2026. Replaces the 23 Nov version.
+Open Agentic Web Challenge (Cognizant). Updated Tue 24 Nov 2026 (**10/10 Scope-Locked Revision**). Incorporates the pre-build critical audit in [docs/review.html](docs/review.html) and verified alignment with the live Devpost portal.
 
 | | |
 |---|---|
-| **Hard deadline** | Mon 11 Jan 2027, 8:00 am PST (midnight going into Tue 12 Jan, Manila time) |
+| **Hard deadline** | Mon 11 Jan 2027, 8:00 am PST (16:00 UTC; midnight going into Tue 12 Jan, Manila time) |
 | **We submit** | **Sun 10 Jan 2027**. 11 Jan is not used |
-| **Judging** | 11 to 18 Jan 2027. The site must stay live until 18 Jan, 5:00 pm PT |
-| **Budget** | About 12 hours a week, 7 weeks, about 84 hours |
-| **Read first** | [docs/idea-summary.md](docs/idea-summary.md): the idea and what each criterion needs |
+| **Judging** | 11 to 18 Jan 2027 (winners announced ~19 Jan). Sites must stay live until 18 Jan, 5:00 pm PT |
+| **Budget** | **72 hrs planned + 12 hr holiday buffer** (84 hrs total across 7 weeks, ~12 hrs/week) |
+| **Read first** | [docs/idea-summary.md](docs/idea-summary.md) and [docs/review.html](docs/review.html) (Road to 10/10 Blueprint) |
 | **Rules and spec** | [research/challenge-requirements.md](research/challenge-requirements.md) |
+| **Single source of facts** | [docs/facts.md](docs/facts.md) |
 
 ---
 
 ## 1. What we are building
 
-**Dialect**: agent networks that learn each hospital's own lab-code "dialect" and ask a human instead of guessing. They are published as open agentic websites, and a hospital's data never goes to a peer site.
+**Dialect** is a **zero-install hospital lab-code mapping and LIS-migration drift workbench** built as an open agentic website. It publishes evolvable Neuro SAN agent networks that learn each hospital's local lab-code "dialect", abstain (`+1 / 0 / -5`) instead of guessing, strip PHI deterministically in the browser, run locally without sending hospital data to peer sites, and export ready-to-import **FHIR R4 `ConceptMap` JSON, CSV, and drift-diff tables** for hospital interface engines (such as Mirth Connect, Rhapsody, or Cloverleaf).
+
+Dialect hits **both** challenge tracks simultaneously: **agentified websites** (two live hospital origins) and **reusable community infrastructure** (Conformance Validator v1 + `DialectProfile` v1 schema + 0-Byte Privacy Receipt).
 
 What we ship by 10 Jan:
-1. **Two hospital websites** on two different origins (Hospital A and Hospital B). Each publishes a lab-code mapping agent network, and B can load A's network after the visitor consents.
-2. **A review screen** where an analyst sees the agent's mappings, sees what it refused to guess, and approves or fixes each one. Approved mappings go into that hospital's private alias table.
-3. **Evolution results**: network variants evolved offline against known-correct answers, with every generation and its score published on the site.
-4. **The Dialect Conformance Validator**: a page anyone can point at an agentic website to check it against the challenge spec. The challenge repo's own validation step is still an empty TODO.
-5. **Shared tools**: the validator, the hospital dialect generator (fake HL7 lab messages with each hospital's quirks and known answers) and the abstain-aware scorer.
+1. **Two hospital open agentic websites** on two distinct origins (**Hospital A** and **Hospital B**). Hospital B loads A's published network by exact name after explicit origin consent, runs a **deterministic client-side PHI stripper** (`PID`/`PV1`/`NK1`/`NTE` removed in plain TypeScript with a visible stripped-payload preview), offers a **3-tier inference router** (schema-locked no-key proxy, visitor BYOK, and 1-click Local/On-Prem LLM preset), and displays a **Live Egress & 0-Byte Privacy Receipt** proving `0 bytes` of private context or keys reached Origin A.
+2. **Interface-analyst review workbench**: displays auto-mapped proposals alongside the "ask a human" pile (top-3 candidates + reason), executes WebMCP-aligned **human-confirmed local site actions** (`save_mapping` into B's private `sly_data` alias table, showing destination and arguments before writing), and finishes with **1-click FHIR R4 `ConceptMap` JSON, CSV, and S3 Drift-Diff exports**.
+3. **Error-trace symbolic evolution**: offline Node evolution in `evolve/` mutating concrete Neuro SAN disambiguation rules directly from `-5` failure traces, publishing every generation's resolved Neuro SAN JSON, held-out score, and **readable `Gen 0 → Gen N` rule diffs** on the site.
+4. **Dialect Conformance Validator v1 + Embeddable SVG Badge**: a standalone static page anyone can point at any open agentic website to verify all Stage One / MVP spec checks, export a JSON report, and copy an embeddable **`OAW Spec 7/7 Pass` SVG badge**. Launched early in Cognizant's GitHub Discussions (where the official repo's validation step is still an empty `TODO`).
+5. **Shared open tools & CI guard**: open **`DialectProfile` v1 JSON schema** (`profiles/lab-hl7/`), synthetic HL7 v2 dialect generator (`MSH-11=T`), abstain-aware scorer (`+1 / 0 / -5`), and an automated **CI `verify:docs` consistency guard**.
 
-Scoring rule everywhere: **+1** correct, **0** "ask a human", **-5** confident and wrong.
+Scoring rule everywhere: **+1** correct, **0** "ask a human" (abstain), **-5** confident and wrong.
 
-Rules we never break: synthetic data only, not a clinical tool, a human approves every write, and the visitor's key never reaches a peer site.
+Rules we never break:
+- **Synthetic data only** — fictional hospitals and patients (`MSH-11=T`, `SYN-000123`, `SYNTHETIC^PATIENT`); never real patient records.
+- **Not a clinical tool** — every mapping screen shows *"Synthetic data. Not for clinical use. A human must approve."*
+- **Human approves every write** — destination and arguments shown before writing to private `sly_data`.
+- **Deterministic safety & privacy in plain code** — unit/UCUM validation and PHI stripping (`PID`/`PV1`/`NK1`/`NTE`) run in plain TypeScript, never as LLM prompt instructions.
+- **Honest privacy boundaries** — hospital data, private alias tables, and visitor BYOK keys **never reach peer sites** (verifiable 0-byte receipt); only PHI-stripped catalog metadata reaches the site's chosen LLM router (or zero external endpoints when using the 1-click Local/On-Prem LLM preset).
+- **Strict ODbL / MIT isolation** — MIMIC-IV Demo v1.0 rows remain **strictly held-out for evaluation only** and never enter few-shot prompts embedded in MIT-licensed network JSON.
 
 ---
 
-## 2. Scope decisions (defaults, change any of them by 25 Nov)
+## 2. Scope decisions (locked at Gate G1)
 
-| Decision | Default | Why |
+| Decision | Locked 10/10 Plan | Why |
 |---|---|---|
-| Hospitals | **Two**, with a third only as a stretch | Two already prove transfer. The hours go to the validator, which scores under two criteria |
-| Runtime | Reuse the nsDeploy reference runtime (Apache-2.0) | Writing our own would eat the Stage One week |
-| Default AI model | A small same-origin endpoint with our key, a hard daily spend cap and a rate limit | The spec requires a path that works with no visitor key. A key placed in a static page would be public |
-| Bring your own key | Offered as well | Shows the spec's credential rules (key never reaches the peer) |
-| Evolution | Offline Node scripts, results published as files | The browser runtime only lives as long as the tab |
-| Test data | Real standards and real public lab names, fictional hospitals and patients, in four labelled scenarios (S1 to S4). Details: [docs/data-and-scenarios.md](docs/data-and-scenarios.md) | Testing only on quirks we wrote ourselves is circular; the real MIMIC names fix that |
-| Stack | TypeScript, Vite for the sites, Node scripts, Vitest | Same stack as your previous project; Python is not installed |
-| Hosting | One Vercel project per hospital, each on its own `*.vercel.app` origin | GitHub Pages project sites share one origin |
+| Hospitals | **Two origins (A & B)**; Hospital C cut | Two distinct origins prove 100% of cross-origin consent, privacy, and transfer; cutting Hospital C saves ~14 hrs and eliminates doc drift |
+| Runtime | Reuse `nsDeploy` reference runtime (Apache-2.0) + **Week-2 2-origin smoke test** | Pulling minimal A↔B cross-origin peer loading into P2 (by 6 Dec) catches CORS/`bridge/` issues two weeks before holidays |
+| 3-Tier Inference Router | **(1)** Schema-locked, IP-rate-limited, daily-capped same-origin no-key Vercel proxy (+ labelled replay fallback); **(2)** Visitor BYOK; **(3)** 1-click **Local / On-Prem LLM preset** (`localhost:11434/v1`) | Spec requires a working no-key default path; schema-locking blocks bot-drain; BYOK proves key isolation; Local/On-Prem proves true zero external egress for real hospitals |
+| Privacy Verification | **Client PHI Stripper** + built-in **Live Egress & 0-Byte Privacy Receipt** inside Hospital B | Instruments `fetch()` + `PerformanceResourceTiming` to export a verifiable 0-byte receipt for Origin A; replaces the fragile ~18-hr standalone Validator v2 harness in ~4 hrs |
+| Evolution | Offline Node scripts evolving **error-trace symbolic disambiguation rules** + `Gen 0 → Gen N` diffs | Browser runtime is tab-scoped; mutating concrete clinical rules from `-5` traces avoids looking like an 80-run hyperparameter grid search |
+| Test data & Scenarios | **Three locked active scenarios** (`S1` Referral Transfer, `S2a/S2b` MIMIC-IV 269 Real Dictionary, `S3` LIS System Switch). `S4` (eICU) & `S5` cut to stretch | Cuts ~16 hrs of unlabelled eICU extraction while S1 + S2a/S2b + S3 answer every scientific and real-world judge question |
+| Analyst Exports | **1-click FHIR R4 `ConceptMap` JSON, CSV, and S3 Drift-Diff audit report** | Turns a browser demo into a deployable workbench feeding Mirth Connect, Rhapsody, or Cloverleaf |
+| Community Tooling & CI | **Conformance Validator v1** (launched mid-Dec) + `OAW Spec 7/7 Pass` SVG badge + `DialectProfile` v1 schema + **CI `verify:docs`** | High-leverage community adoption under Potential Impact + automated schema/`facts.md` parity guard for AI screeners |
+| Stack & Hosting | TypeScript, Vite, Node scripts, Vitest; two separate Vercel projects (`*.vercel.app`) | JavaScript browser runtime; no Python installed; separate Vercel origins enforce true cross-origin boundaries |
 
 ---
 
-## 3. Timeline
+## 3. Holiday-proof timeline (72 hrs planned + 12 hr buffer = 84 hrs)
+
+Cutting ~48 hrs of low-ROI stretch work (Hospital C, S4 eICU, standalone Validator v2 harness) pays 4× over for ~11 hrs of 10/10 upgrades while keeping a 12-hour emergency buffer. Core coding finishes by **Sun 20 Dec** so Christmas, Rizal Day, and New Year are strictly cached offline eval runs, charts, and user tests.
 
 | Phase | Dates | Hours | Main output | Gate |
 |---|---|---|---|---|
-| **P0 Research** | Mon 23 to Wed 25 Nov | 4 | `research/00-summary.md` and 7 files | **G1, Wed 25 Nov:** confirm the scope decisions and the real test set |
-| **P1 Spike** | Thu 26 to Sat 28 Nov | 9 | Scorer, generator, 3 contenders, transfer test | **G2, Sat 28 Nov:** kill rule (section 5) |
-| **P2 Stage One + validator v1** | Sun 29 Nov to Sun 6 Dec | 14 | Hospital A live and conforming, validator checks it | **G3, Sun 6 Dec:** validator shows all Stage One checks passing on the live URL |
-| **P3 Core build** | Mon 7 to Sun 20 Dec | 22 | Hospital B, peer loading, review screen, approval, private alias table | **G3b, Sun 20 Dec:** peer loading across two origins + first mock judging |
-| **P4 Evolution, proof, polish** | Mon 21 Dec to Sun 3 Jan | 20 | Evolution, four experiments, results card, validator v2, user test | **G4, Sun 3 Jan:** feature freeze + second mock judging |
-| **P5 Submission** | Mon 4 to Sat 9 Jan | 15 | Video, Devpost text, screenshots, README | Video done **Thu 7 Jan** |
-| **Submit** | **Sun 10 Jan** | | Entry submitted | |
-
-P4 falls over Christmas, Rizal Day and New Year. Do the heavy coding on the days in between.
+| **P0 Research** | Mon 23 to Wed 25 Nov | **4** | `research/00-summary.md` + 7 files, MIMIC 269 unit-dependence audit | **G1, Wed 25 Nov:** confirm locked scope, MIMIC S2a/S2b split, and remaining eligibility checks |
+| **P1 Spike** | Thu 26 to Sat 28 Nov | **9** | Scorer, generator, **4-way fair baselines**, **disentangled S1a/S1b transfer**, S2a/S2b check, error-trace rule mutation prototype | **G2, Sat 28 Nov:** tightened kill rule (section 5) |
+| **P2 Stage One + Validator v1 + 2-Origin Smoke Test** | Sun 29 Nov to Sun 6 Dec | **14** | Hospital A live + schema-locked proxy + PHI stripper + Validator v1 w/ SVG badge + **minimal Hospital B cross-origin `nsDeploy` smoke test** + starter CI `verify:docs` | **G3, Sun 6 Dec:** Validator v1 passes 7/7 on live Hospital A AND minimal B loads A across two origins |
+| **P3 Core Workbench & Privacy Proof** | Mon 7 to Sun 20 Dec | **20** | Full Hospital B workbench, `DialectProfile` v1 schema, Live 0-Byte Privacy Receipt, FHIR `ConceptMap`/CSV/Drift exports, 1-click Localhost LLM preset, **mid-Dec Validator v1 launch in Discussions** | **G3b, Sun 20 Dec:** full A↔B workflow live + Validator v1 posted + 1st mock judging |
+| **P4 Evolution, Empirical Proof & Polish** | Mon 21 Dec to Sun 3 Jan | **13** | Offline error-trace evolution + `Gen 0 → Gen N` diffs, cached 4-way/S1/S2a/S2b/S3 evals (`results.json` + 95% CIs + Pareto chart), 3-user timed test (<3 min), practitioner quote, full CI `verify:docs` | **G4, Sun 3 Jan:** feature freeze + 2nd mock judging |
+| **P5 Submission** | Mon 4 to Sat 9 Jan | **12** | 2-min video (own voice, trademark-clean), Devpost text, annotated screenshots, final README & CI green check | Video done **Thu 7 Jan** |
+| **Buffer** | Reserved (P2–P5) | **12** | Emergency cushion for `nsDeploy` quirks or holiday slips | |
+| **Submit** | **Sun 10 Jan** | | Entry submitted 24 hrs ahead of Mon 11 Jan 8:00 am PST hard deadline | |
 
 ---
 
 ## 4. Phase details
 
-### P0 Research (Mon 23 to Wed 25 Nov)
+### P0 Research (Mon 23 to Wed 25 Nov · 4 hrs)
 - [ ] Run [research/RESEARCH-PROMPT.md](research/RESEARCH-PROMPT.md) and get the 8 research files.
 - [x] Find a **real, legally usable** list of local lab test names with known LOINC codes. **Found 24 Nov:** MIMIC-IV Demo v1.0 `d_labitems`, 1,630 real names, 269 with hospital-assigned LOINC codes, ODbL, no patient data. See [docs/data-and-scenarios.md](docs/data-and-scenarios.md).
 - [x] Confirm the LOINC licence lets us bundle a subset. **Yes, 24 Nov:** records may be deleted, fields not changed. Still to find: the exact notice text to include.
-- [ ] Clear the remaining P0 checks in data-and-scenarios.md: eICU name count, MSH-11 values, a source for SI vs conventional units, LOINC synonym fields, a web check that our fictional hospital names are not real.
-- [ ] Clear every CHECK item in [research/challenge-requirements.md](research/challenge-requirements.md), including your age (18+).
-- [ ] Spot-check 5 cited sources yourself.
+- [ ] **MIMIC 269 unit-dependence audit**: inspect the 269 LOINC-coded MIMIC rows and tag each as unit-dependent (e.g., Mass/vol vs. Moles/vol) vs. unit-invariant to prepare the **S2a vs. S2b** benchmark.
+- [ ] Clear remaining P0 checks: MSH-11 table 0103 values, a cited source for SI vs. conventional units, LOINC synonym field names, web check that our fictional hospital names are not real. *(eICU check moved to stretch with S4.)*
+- [ ] Clear every CHECK item in [research/challenge-requirements.md](research/challenge-requirements.md), including age (18+).
+- [ ] Spot-check 5 cited sources directly.
 
-**G1 (Wed 25 Nov):** record the scope decisions and the test set in DECISIONS.md.
+**G1 (Wed 25 Nov):** verify all scope locks and open questions in `DECISIONS.md` and `PLAN.md` §9.
 
-### P1 Spike (Thu 26 to Sat 28 Nov)
-- [ ] **Scorer first, with tests:** +1 / 0 / -5, plus accuracy, abstain rate and wrong-confident rate.
-- [ ] **LOINC subset:** about 100 common lab tests.
-- [ ] **Dialect generator:** clean result + hospital profile → HL7 v2 ORU_R01 message with that hospital's quirks (local codes, abbreviations, units, missing fields) and the known right answer.
-- [ ] **Three contenders** on a dialect none of them has seen: (1) string or embedding match, (2) one AI call with retrieval, (3) a small evolved network.
-- [ ] **Transfer test:** tune on A, run on B, adapt on B, test on B's held-out set.
+### P1 Spike (Thu 26 to Sat 28 Nov · 9 hrs)
+- [ ] **Scorer first, with unit tests:** `+1 / 0 / -5`, plus accuracy, abstain rate, wrong-confident rate, and bootstrap 95% confidence intervals.
+- [ ] **LOINC subset:** ~100–300 common lab tests including every code present in the MIMIC 269 test set (fields unchanged; LOINC notice included).
+- [ ] **Dialect generator:** clean result + hospital profile → HL7 v2 `ORU^R01` (`MSH-11=T`, `SYNTHETIC^PATIENT`) with hospital quirks (local codes, abbreviations, SI vs. conventional units, missing fields) and exact ground truth.
+- [ ] **4-way fair baseline matrix** on ≥200 held-out mappings:
+  1. Lexical / string-similarity match
+  2. Forced-choice single LLM call with retrieval (LabBridge-style)
+  3. **Abstain-prompted single LLM call** with retrieval (explicitly told `+1 / 0 / -5`)
+  4. Dialect evolved network (deterministic UCUM guardrail + error-trace disambiguation rules)
+- [ ] **Disentangled transfer test (S1a vs. S1b):** tune on Hospital A, run on Hospital B, adapt on B, and evaluate separately on:
+  - **S1a Repeat-Code Cache**: previously approved codes (0 LLM tokens, workload savings)
+  - **S1b Strictly Disjoint Unseen-Code Generalization**: brand-new Hospital B codes using B's approved examples as few-shot dialect hints
+- [ ] **MIMIC S2a vs. S2b sanity check:** verify unit-dependent rows abstain cleanly without site unit mode (S2a) and recover coverage once Hospital R sets US conventional units in `sly_data` (S2b), keeping MIMIC strictly held-out.
+- [ ] **Error-trace rule mutation prototype:** confirm mutating concrete disambiguation rules from `-5` traces (specimen conflict, calculated-vs-measured, missing-unit escalation, panel-vs-analyte) alongside retrieval `k` and abstain threshold improves held-out score.
 
-What evolves: the prompt template (from a fixed list), the number of candidate codes shown, which examples are included, the abstain threshold, and whether the unit check runs before or after the mapper. "Adapting to a site" means the site's own approved mappings become examples and hints for that site only.
+**G2 (Sat 28 Nov):** evaluate tightened kill rule (section 5) and record result in `DECISIONS.md`.
 
-### P2 Stage One site + validator v1 (Sun 29 Nov to Sun 6 Dec)
-Build the site and the validator together. The validator becomes our own Stage One test.
+### P2 Stage One + Validator v1 + 2-Origin Smoke Test (Sun 29 Nov to Sun 6 Dec · 14 hrs)
+Build Hospital A, Validator v1, and a minimal Hospital B cross-origin smoke test together so cross-origin `nsDeploy` risk is retired in Week 2.
 
-Hospital A must have:
-- [ ] Public HTTPS URL (the repo is already public with an MIT licence; keep ODbL and LOINC data in their own folders with their notices)
-- [ ] `agent-manifest.json` with the networks, default router and model, peer policy and `allowed_peers`
-- [ ] Network as fully resolved JSON in the Neuro SAN format, with a front agent
-- [ ] `links.json` peer-network link map
-- [ ] Runtime file (nsDeploy) and an interface
-- [ ] Default AI path with no key: same-origin endpoint, daily spend cap, rate limit
-- [ ] Bring-your-own-key settings; the key stays in the browser
-- [ ] One registered site action, "save mapping", showing destination and arguments before it runs
-- [ ] CORS headers on every public file
-- [ ] Visible errors for: invalid network, composition cycle, over-budget request, denied origin
-- [ ] Disclaimer on every mapping screen: "Synthetic data. Not for clinical use. A human must approve."
+Hospital A (Origin A, public Vercel URL):
+- [ ] `agent-manifest.json` (networks, default router & model, `peer_policy`, `allowed_peers`)
+- [ ] Fully resolved Neuro SAN `.json` agent network with front agent
+- [ ] `links.json` peer-network link map + `bridge/` page + CORS headers on every public artifact
+- [ ] `nsDeploy` browser runtime + clean interface
+- [ ] **Deterministic client-side PHI stripper** in plain TypeScript (`PID`, `PV1`, `NK1`, `NTE`, patient IDs/timestamps removed before any LLM call) + unit tests
+- [ ] **Schema-locked default no-key proxy** (same-origin Vercel function accepting only lab-mapping payloads, per-IP rate limit, hard provider daily spend cap, and clearly labelled recorded-run replay fallback)
+- [ ] BYOK settings (key stays strictly in browser) + **1-click Local / On-Prem LLM preset** (`localhost:11434/v1`)
+- [ ] WebMCP-aligned confirmed local site action (`save_mapping`) displaying destination and arguments before writing
+- [ ] Visible error stops for all 4 spec conditions: invalid network, composition cycle, over-budget request, denied origin
+- [ ] Mandatory banner on every mapping screen: *"Synthetic scenario. Real standards and public lab names; fictional hospitals and patients. Not for clinical use. A human must approve."*
 
-Validator v1 (a static page that fetches public files only):
-- [ ] Takes a site URL; checks the manifest, network JSON, `links.json`, CORS headers, front agent, exact-name resolution and schema validity
-- [ ] Shows pass/fail per spec section, with the spec quote and a fix hint
-- [ ] Exports the report as JSON
+Validator v1 (static page fetching public files only):
+- [ ] Checks any site URL for manifest, Neuro SAN JSON, `links.json`, CORS headers, front agent, exact-name resolution, and schema validity
+- [ ] Displays pass/fail per spec section with spec citation and concrete fix hint
+- [ ] Exports JSON conformance report AND generates an embeddable **`OAW Spec 7/7 Pass` SVG badge** + markdown snippet
 
-**G3 (Sun 6 Dec):** the validator shows Hospital A passing every check, tested in a fresh browser profile with no key.
+De-risking & CI:
+- [ ] **Week-2 Cross-Origin `nsDeploy` Smoke Test:** deploy minimal Hospital B on a second Vercel origin (`*.vercel.app`) and verify explicit origin consent, exact-name load of Hospital A's network, and CORS end-to-end
+- [ ] **Starter CI `verify:docs` guard** in GitHub Actions checking manifest/network/`links.json` JSON validity and unit tests on every push
 
-### P3 Core build (Mon 7 to Sun 20 Dec)
-Week 1:
-- [ ] Move the generator and scorer into `profiles/lab-hl7/` as Dialect Profile #1 (LOINC subset + generator + scorer behind one small interface).
-- [ ] Agent network: HL7 parser agent, mapper agent, unit-check tool (plain code), front agent.
-- [ ] "Ask a human" path showing the top candidates and the reason.
+**G3 (Sun 6 Dec):** Validator v1 passes all checks on live Hospital A in a fresh browser profile with no key, AND minimal Hospital B passes the 2-origin peer-load smoke test.
 
-Week 2:
-- [ ] Hospital B deployed on its own origin.
-- [ ] Peer loading: B loads A's network by exact name after a consent card naming A's origin and purpose.
-- [ ] Review screen: approve, fix or skip each mapping; approved ones go to B's private alias table.
-- [ ] Proof that A receives neither B's data, nor B's alias table, nor the visitor's key.
+### P3 Core Workbench & Privacy Proof (Mon 7 to Sun 20 Dec · 20 hrs)
+Week 1 (7–13 Dec):
+- [ ] Package generator, LOINC subset, and scorer into `profiles/lab-hl7/` conforming to an open **`DialectProfile` v1 JSON schema** (`profiles/dialect-profile.schema.json`).
+- [ ] Full multi-agent network: HL7 parser agent, mapper agent, deterministic plain-code UCUM unit guardrail, front agent.
+- [ ] "Ask a human" review queue showing top-3 LOINC candidates, exact abstention reason, and **visible stripped-payload preview** (showing zero PHI sent to the router).
+- [ ] **Mid-Dec Community Launch (~10–13 Dec):** post **Conformance Validator v1 + SVG badge** and `DialectProfile` v1 schema in Cognizant's `agentic-web` GitHub Discussions so other entrants test their sites and cite it before judging.
 
-**G3b (Sun 20 Dec):** peer loading works across the two origins, and first mock judging is done (section 6).
+Week 2 (14–20 Dec):
+- [ ] Complete **Hospital B** workbench on Origin B: origin consent card, exact-name peer load from Hospital A, approve/fix/skip review queue writing to B's private `sly_data` alias table, live accuracy/score update.
+- [ ] **1-Click Exports (confirmed local action `export_concept_map`):** download valid **FHIR R4 `ConceptMap` JSON**, interface-engine **CSV** (Mirth/Rhapsody/Cloverleaf compatible), and **S3 LIS Drift-Diff audit report**.
+- [ ] **Live Egress & 0-Byte Privacy Receipt Inspector** inside Hospital B: instruments outbound `fetch()` + `PerformanceResourceTiming` to show a real-time origin ledger, payload hashes, and an exportable JSON receipt proving `0 bytes` of private context, alias table, or BYOK key reached Origin A (replaces standalone Validator v2 harness).
+- [ ] Live "Conformance" panel on the site verifying all 7 spec interoperability checks.
 
-### P4 Evolution, proof and polish (Mon 21 Dec to Sun 3 Jan)
-- [ ] Evolution loop in `evolve/`: population 8, about 10 generations, fitness on a held-out set.
-- [ ] Publish each generation's network JSON and score; add a lineage view.
-- [ ] Run the four experiments in section 7 and publish the results as `results.json` plus a results card.
-- [ ] **"Try your own code" box:** a visitor types any lab name and sees a mapping or an honest "ask a human".
-- [ ] Validator v2: adds the live checks that run in the browser (consent shown, key not sent to a peer, private context absent at the peer).
-- [ ] Recorded-run fallback, labelled as a replay, for when the daily spend cap is reached.
-- [ ] User test: 3 people, no help, timed. Fix what confuses them.
-- [ ] Ask one real hospital IT, HIMS or lab informatics person for two sentences of feedback, quoted with permission.
-- [ ] Post the validator and the generator in the challenge repo's Discussions.
+**G3b (Sun 20 Dec):** full two-origin Hospital A↔B workbench live, Validator v1 launched in Discussions, and **first mock judging** completed (section 6).
 
-**G4 (Sun 3 Jan): feature freeze** and second mock judging.
+### P4 Evolution, Empirical Proof & Polish (Mon 21 Dec to Sun 3 Jan · 13 hrs, holiday-light)
+- [ ] Run offline **error-trace symbolic evolution** in `evolve/` (population 8, ~10 generations, held-out fitness) mutating concrete disambiguation rules from `-5` traces.
+- [ ] Publish every generation's resolved Neuro SAN JSON, held-out score, and a readable **`Gen 0 → Gen N` rule diff** view on Hospital A.
+- [ ] Run the full benchmark suite (section 7) using cached eval scripts and publish `results.json` + interactive/clean results cards:
+  - 4-way fair baselines with **bootstrap 95% CIs** & **Risk-Coverage / Cost Pareto chart**
+  - Disentangled S1a (Repeat-Code Cache) vs. S1b (Unseen-Code Generalization) curves
+  - S2a vs. S2b MIMIC-IV 269 real-world results (strictly held-out, reported separately from generated data)
+  - S3 LIS migration drift + drift-diff audit results
+- [ ] **"Try your own code" box:** visitor enters any local lab name/unit and sees a mapping, stripped payload preview, or honest "ask a human".
+- [ ] Expand **CI `verify:docs`** to verify `docs/facts.md` ↔ `results.json` number parity and block forbidden privacy/scope wording drift.
+- [ ] Optional polish (only if ahead of schedule): add NANDA Index discovery descriptor.
+- [ ] **3-person unassisted timed user test** (target: <3 minutes end-to-end from batch load to `ConceptMap` export); fix UX friction and record exact completion times in `docs/facts.md`.
+- [ ] Capture a **2-sentence quoted review** (with permission) from one real hospital IT, HIMS, or lab informatics practitioner.
 
-### P5 Submission (Mon 4 to Sat 9 Jan)
-- [ ] Video under 2 minutes, **your own voice**, the site running in a browser, the key result in the first 30 seconds, public on YouTube, with uploaded captions. No third-party trademarks or copyrighted music.
-- [ ] Devpost text following section 6.
-- [ ] Screenshots, each with a caption saying what it proves.
-- [ ] README: a 30-second summary, live links, how to verify each claim, licence, honest limits.
-- [ ] Otari details if Otari is used.
-- [ ] Final check on a phone and a laptop in fresh browser profiles. Run the validator on our own sites one last time.
+**G4 (Sun 3 Jan): feature freeze** + **second mock judging**.
+
+### P5 Submission (Mon 4 to Sat 9 Jan · 12 hrs)
+- [ ] **Demo video** (done **Thu 7 Jan**): under 2 minutes, **your own voice (not AI-generated)**, live browser capture, public on YouTube with uploaded exact captions. First 30 seconds hit the S1 unseen-code transfer curve and `-5` refusal; middle 60 seconds show `Gen 0 → Gen N` rule diff, PHI stripper + 0-Byte Privacy Receipt, and 1-click FHIR `ConceptMap` export; closing 30 seconds show Conformance Validator v1 + community badge.
+  - **Video trademark hygiene:** no copyrighted music and no third-party vendor brand logos/trademarks on screen (use generic on-screen labels such as *"hospital interface engines"* and *"local OpenAI-compatible server"*, and follow Regenstrief's LOINC® notice rules).
+- [ ] Devpost text following section 6 (exact criterion headings, sourced claims from `docs/facts.md`, Otari email + feedback if Otari is used).
+- [ ] Annotated screenshots, each with a one-line caption stating the exact claim it proves.
+- [ ] Final README update with live URLs, live Validator v1 links, and measured numbers copied verbatim from `docs/facts.md` / `results.json`.
+- [ ] Verify **CI `verify:docs`** is green on `main`, test both origins on mobile and laptop in fresh browser profiles (no key), and run Validator v1 on both live origins one final time.
+- [ ] **Submit Sun 10 Jan 2027.** Keep sites live through **18 Jan 2027, 5:00 pm PT**.
 
 ---
 
 ## 5. Kill rule (G2, Sat 28 Nov)
 
-Mean score per mapping runs from -5 to +1, a range of 6. **Drop the idea if either is true:**
-1. The evolved network does not beat the single AI call by at least **0.6 points per mapping** on at least 200 held-out mappings.
-2. Transfer shows no real drop and recovery: accuracy at B before adapting is not at least **10 points** below A, or adapting does not win back at least **half** of the drop.
+Mean score per mapping runs from `-5` to `+1` (a 6-point range). **Drop or pivot the idea if either condition fails:**
+1. **Fair Baseline Win:** The evolved Dialect network fails to beat **both** the forced-choice single LLM call **and** the **abstain-prompted single LLM call** by at least **+0.6 mean points per mapping** on at least **200 held-out mappings** (bootstrap 95% CI reported).
+2. **True Unseen-Code Transfer:** On **strictly disjoint unseen local codes** at Hospital B (excluding exact-alias cache hits), accuracy before adapting does not drop at least **10 points** below Hospital A, OR adapting via B's approved few-shot dialect hints does not recover at least **half** of that drop.
 
-If it fails, switch to a fallback idea (Silicon Breeders, Jury of Strangers or Safe Generative UI). The validator can move with us, because it suits any entry. Record the result in DECISIONS.md either way.
+If either fails, pivot to a fallback idea (Silicon Breeders, Jury of Strangers, or Safe Generative UI) while keeping Conformance Validator v1 (which applies to any entry). Record the Gate G2 decision and raw numbers in `DECISIONS.md` either way.
 
 ---
 
 ## 6. Passing both AI screening and human judges
 
-The rules allow "automated AI-driven analysis", and judges need not watch past 2 minutes. An AI screener reads text, checks links and files, and compares claims against evidence. A human judge skims and looks for one memorable moment. We design for both.
+The rules allow automated AI-driven analysis, and judges need not watch past 2 minutes. An AI screener parses headings, JSON files, links, and cross-doc consistency; a human judge looks for real-world credibility and one unforgettable proof moment. We engineer for both.
 
-### What an AI screener rewards, and what we do
+### What an AI screener checks, and how we pass cleanly
 | An AI screener will likely… | So we… |
 |---|---|
-| Match the text against each criterion | Use the four criterion names as headings, word for word, and answer each in the first two sentences under it |
-| Check the Stage One items | Include a table mapping each requirement to a live URL, and our own validator report as proof |
-| Parse our JSON files | Keep the manifest, network and `links.json` valid; publish `results.json` and the validator report |
-| Look for evidence behind claims | Put a number, a link or a screenshot next to every claim, and mark anything unchecked as UNVERIFIED |
-| Penalize overclaiming and contradictions | Keep one facts file (`docs/facts.md`) as the only source for every number, and copy from it into the README, Devpost and video |
-| Read the video transcript | Upload our own captions, so the transcript is exact |
-| Check novelty against prior art | Name LabBridge and RELMA ourselves and say exactly what is new |
-| Check whether data is real, private or made up | Label every scenario as synthetic in the UI banner, `scenario.json`, HL7 MSH-11 = `T`, `DATA.md` and the Devpost text, and cite every real source with its licence |
+| Match text against each judging criterion | Use the four exact criterion names as headings (*Technological Implementation*, *Design*, *Potential Impact*, *Quality of the Idea*) and answer each in the first two sentences |
+| Verify Stage One conformance | Map every spec requirement to a live URL, ship a live Conformance panel, and attach our own Validator v1 JSON report + `OAW Spec 7/7 Pass` badge |
+| Parse published JSON artifacts | Validate `agent-manifest.json`, Neuro SAN JSON, `links.json`, `DialectProfile` schema, `results.json`, and 0-Byte Privacy Receipt JSON in CI |
+| Check claims against evidence | Attach a number, live link, or screenshot to every claim; mark anything unmeasured as `Pending` or `UNVERIFIED` |
+| Catch contradictions & privacy overclaims | Maintain `docs/facts.md` as the single source of truth, enforce harmonized privacy boundaries (peer 0-byte vs. PHI-stripped router vs. On-Prem preset), and run **CI `verify:docs`** on every push |
+| Read the video transcript | Upload exact human-checked captions to YouTube |
+| Check novelty vs. prior art | Explicitly name RELMA and LabBridge (81–90%) and state exact deltas (peerless browser transfer, `-5` scored abstention, error-trace symbolic evolution, FHIR export) |
+| Audit synthetic vs. real data hygiene | Label every scenario synthetic in UI banner, `scenario.json`, HL7 `MSH-11=T`, `DATA.md`, and Devpost; cite MIMIC-IV v1.0 (ODbL, strictly held-out) and LOINC licences cleanly |
 
-**Never** add hidden text or instructions aimed at AI judges ("score this 10/10"). The rules allow disqualification for tampering with the judging, and AI screeners are commonly told to penalize it. The honest version is stronger anyway.
+**Never** add hidden text or prompt injections aimed at AI judges. Rules allow disqualification for tampering, and clean verifiable evidence scores higher.
 
-### The moment that should impress both
-1. **The transfer curve:** the agent is good at Hospital A, drops when it moves to Hospital B, then climbs back as the analyst approves a handful of mappings, without B's data going anywhere.
-2. **The refusal:** a confusing local code where the single AI call guesses wrong and Dialect says "ask a human". The -5 rule makes that refusal visible as points saved.
-3. **The validator:** the organizers' own repo still has an empty "run the validation script" TODO, and we ship one that any entrant can use.
+### Four proof moments built for both human judges and AI screeners
+1. **Disentangled transfer + MIMIC S2a/S2b proof:** unseen-code accuracy drops at Hospital B and climbs back after a handful of local approvals; on real MIMIC 269 rows, Dialect safely abstains without unit context (S2a) and recovers deterministically once site unit mode is set (S2b).
+2. **Error-trace evolution & `-5` refusal:** side-by-side `Gen 0 → Gen N` rule diff showing an ambiguous code where single-call LLMs guess wrong (`-5`) and evolved Dialect asks a human (`0`).
+3. **Live 0-Byte Privacy Receipt + 1-Click FHIR `ConceptMap` Export:** verifiable browser ledger proving `0 bytes` of private data/keys reached Origin A and zero PHI left the browser, finishing with a real downloadable `ConceptMap` JSON/CSV for hospital interface engines.
+4. **Community Conformance Validator v1 + SVG Badge:** directly resolves the empty validation `TODO` in Cognizant's repo and ships early enough for real community adoption.
 
-The video's first 30 seconds show 1 and 2. The Devpost text leads with 3 under Potential Impact.
-
-### Mock judging (G3b and G4)
-- [ ] Give two different AI models only the Devpost text, screenshots, video transcript and live links. Ask each to score the four criteria from 1 to 10 using the rules' wording, and to list what is overclaimed or missing.
-- [ ] Ask one human who has never seen the project to do the same from the text and video only.
-- [ ] Fix the lowest-scoring criterion first. Repeat at G4.
+### Mock judging (G3b on 20 Dec and G4 on 3 Jan)
+- [ ] Give two different AI models only the Devpost text, screenshots, video transcript, and live links; score all four criteria 1–10 using official rules wording and flag every unsupported or inconsistent claim.
+- [ ] Ask one uninvolved human reviewer to score cold from the text and 2-minute video only.
+- [ ] Fix the lowest-scoring criterion first; repeat at G4.
 
 ---
 
-## 7. Experiments and the numbers we publish
+## 7. Experiments and published evidence (`results.json`)
 
-| Experiment | What it shows | Published as |
+Every published number uses held-out data the agents never saw, with results on real MIMIC names reported strictly separately from generated data.
+
+| Experiment | What it proves | Published as |
 |---|---|---|
-| Transfer | Accuracy at A, at B before adapting, at B after adapting | Curve on the site, `results.json` |
-| Abstention | Wrong confident answers per 100, with and without "ask a human" | Results card |
-| Baselines | String match vs one AI call vs evolved network, on the -5/0/+1 score | Results card |
-| Real-world set (scenario S2) | The same scores on the 269 real MIMIC lab names with LOINC codes, reported separately from generated data | Results card |
-| Lab system switch (scenario S3) | Wrong confident answers after codes change overnight | Results card |
-| Cost | Score against tokens per message | Chart |
-| Privacy | A receives no data, no alias table and no key from B | Validator v2 report |
-
-Fitness and every published number use held-out data the agents never saw.
+| **S1a: Repeat-Code Cache** | Exact alias-table hits (0 LLM tokens) after analyst approval — operational workload savings | Results card + `results.json` |
+| **S1b: Unseen-Code Generalization** | True dialect transfer on **strictly disjoint unseen codes** at Hospital B (before vs. after adapting) | Transfer curve + `results.json` |
+| **4-Way Fair Baselines** | Lexical vs. Forced-Choice LLM vs. **Abstain-Prompted Single LLM** vs. Dialect Evolved on `+1 / 0 / -5`, wrong-confident/100, and **bootstrap 95% CIs** | Results card + Risk-Coverage chart |
+| **S2a vs. S2b: Real MIMIC-IV 269** | Real hospital names (ODbL, strictly held-out): **S2a** (no unit convention → safe abstention) vs. **S2b** (+ site unit convention in `sly_data` → deterministic UCUM recovery) | Separate real-data results card |
+| **S3: Lab System Switch (LIS Drift)** | Wrong confident answers per 100 after local codes change overnight + exportable Drift-Diff audit | Results card + sample drift report |
+| **Evolution Lineage** | Score progression + concrete symbolic rules mutated from `-5` traces (`Gen 0 → Gen N`) | Visual rule-diff card + published JSONs |
+| **Cost Pareto & Egress Privacy** | Score vs. tokens/message Pareto + live **0-Byte Privacy Receipt** JSON + 0-PHI payload preview | Pareto chart + downloadable receipt JSON |
 
 ---
 
@@ -204,21 +231,26 @@ Fitness and every published number use held-out data the agents never saw.
 
 | Risk | Mitigation |
 |---|---|
-| A single AI call already solves the task | Kill rule on 28 Nov |
-| Our fake quirks are cleaner than real hospitals | The real-world test set, and saying so openly |
-| AI cost grows | Population 8, a cheap model, cache everything, cap tokens, daily spend cap |
-| Judges never run it | The video, screenshots and results card carry the story |
-| Looks like a clinical product | Disclaimers, human approval, interoperability framing |
-| Overclaiming gets flagged by AI screening | One facts file, a source on every number, an honest limits section |
-| Low-memory machine (about 7.6 GB) | No Synthea or Java; one heavy process at a time |
-| Time shrinks | **Cut in this order:** (1) third hospital, (2) second Dialect Profile, (3) lineage view polish, (4) validator v2 live checks. **Never cut:** Stage One site, the no-key default path, validator v1, the video |
+| Single AI call (with abstention prompt) already solves the task | Tightened Gate G2 kill rule on 28 Nov against both forced-choice and abstain-prompted LLM baselines |
+| Transfer recovery looks like trivial alias caching | Disentangled S1a (cache) vs. S1b (strictly unseen codes) reporting; G2 requires recovery on unseen codes |
+| MIMIC-IV `d_labitems` lacks measurement units | Turned into S2a vs. S2b feature showing honest abstention without unit context and deterministic UCUM recovery with site unit mode |
+| ODbL share-alike contamination of MIT network JSON | MIMIC rows are strictly held-out evaluation data only, never embedded into prompts or evolved networks |
+| Public no-key proxy drained by bots before judging | Schema-locked to lab-mapping payloads only + per-IP rate limit + hard provider daily spend cap + labelled replay fallback |
+| Cross-origin `nsDeploy` / CORS / `bridge/` surprises | Pulled minimal 2-origin Vercel smoke test into Week 2 (P2, by 6 Dec) |
+| Overclaiming or doc drift flagged by AI screening | Single `docs/facts.md` + harmonized privacy wording + automated **CI `verify:docs`** on every push |
+| Low-memory dev machine (~7.6 GB RAM, no Python) | Pure Node/TypeScript stack; no Synthea/Java; run one heavy process at a time |
+
+**Already cut at Gate G1 (moved to stretch):** Hospital C (`sites/hospital-c`), Scenario S4 (eICU intake), standalone Validator v2 cross-origin harness (replaced by built-in 0-Byte Privacy Receipt), Scenario S5 (non-healthcare Dialect Profile #2).
+
+**Emergency cut order (only if hours slip despite the 12-hr buffer):** (1) optional NANDA Index descriptor, (2) extra polish on "Try your own code" box, (3) S3 Drift-Diff UI animations, (4) interactive Pareto chart → static SVG.
+
+**Never cut:** Stage One two-origin sites + schema-locked no-key proxy, client PHI stripper + Live 0-Byte Privacy Receipt, 1-click FHIR `ConceptMap`/CSV export, Conformance Validator v1 + SVG badge, 4-way S1/S2a/S2b `results.json`, and the 2-minute video.
 
 ---
 
-## 9. Open questions (answer by Wed 25 Nov)
+## 9. Open questions (confirm by Wed 25 Nov)
 
-1. Are you 18 or older? (Rules requirement.)
-2. Is 12 hours a week realistic until 10 Jan?
-3. Do you accept two hospitals + the validator instead of three hospitals?
-4. What is your API budget? A few dollars covers the spike; the public default path needs a hard daily cap.
-5. Solo or team?
+1. Are you 18 or older? *(Challenge eligibility requirement.)*
+2. What hard daily spend cap (e.g., $1–$2/day) do you want on the public no-key Vercel proxy during judging?
+3. Solo developer or adding a teammate?
+4. Do you plan to use Mozilla Otari for any router path? *(If yes, record your Otari email and 1–2 sentences of product feedback for Devpost.)*
